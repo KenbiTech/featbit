@@ -10,7 +10,7 @@ services:
     depends_on:
       - api-server
     ports:
-      - "8081:80"
+      - "8000:80"
     networks:
       - featbit-network
 
