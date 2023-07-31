@@ -53,7 +53,7 @@ services:
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      MONGO_URI: mongodb://admin:password@mongodb:27017
+      MONGO_URI: <connection-string>
       MONGO_INITDB_DATABASE: featbit
       # MONGO_HOST: mongodb
       CHECK_DB_LIVNESS: false
