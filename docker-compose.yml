@@ -4,9 +4,9 @@ services:
   ui:
     image: featbit/featbit-ui:latest
     environment:
-      - API_URL=https://<domain>:5000
+      - API_URL=https://<domain>:5001
       - DEMO_URL=https://featbit-samples.vercel.app
-      - EVALUATION_URL=https://<domain>:5100
+      - EVALUATION_URL=https://<domain>:5101
     depends_on:
       - api-server
     ports:
