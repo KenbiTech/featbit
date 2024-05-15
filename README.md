@@ -3,36 +3,55 @@
 
 <div id="header" align="center">
   <div id="badges">
-  <a href="https://github.com/featbit/featbit/blob/main/LICENSE">
-    <img src="https://img.shields.io/static/v1?style=flat-square&label=license&message=MIT&color=brightgreen" />
-  </a>
-  <a href="https://twitter.com/RealFeatBit">
-    <img src="https://img.shields.io/badge/Twitter-1DA1F2?style=flat-square&logo=twitter&logoColor=white"/>
-  </a>  
-  <a href="https://medium.com/@featbit">
-    <img src="https://img.shields.io/badge/Medium-grey?style=flat-square&logo=medium&logoColor=white" alt="Read about RATH on medium"/>
-  </a>
-  <a href="https://join.slack.com/t/featbit/shared_invite/zt-1ew5e2vbb-x6Apan1xZOaYMnFzqZkGNQ">
-    <img src="https://img.shields.io/badge/Slack-green?style=flat-square&logo=slack&logoColor=white" alt="Join FeatBit on Slack"/>
-  </a>
-  <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-  <a href="#">
-    <img src="https://img.shields.io/badge/all_contributors-18-orange.svg?color=ee8449&style=flat-square" alt="All Contributors" />
-  </a>
-  <!-- ALL-CONTRIBUTORS-BADGE:END -->
+    <a href="https://github.com/featbit/featbit/blob/main/LICENSE">
+      <img src="https://img.shields.io/static/v1?style=flat-square&label=license&message=MIT&color=brightgreen" />
+    </a>
+    <a href="https://twitter.com/RealFeatBit">
+      <img src="https://img.shields.io/badge/Twitter-1DA1F2?style=flat-square&logo=twitter&logoColor=white"/>
+    </a>  
+    <a href="https://awsmfoss.com/featbit/">
+      <img src="https://img.shields.io/badge/Awesome_F%2FOSS-Certified-purple?style=flat-square" alt="Read about RATH on medium"/>
+    </a>
+    <a href="https://join.slack.com/t/featbit/shared_invite/zt-1ew5e2vbb-x6Apan1xZOaYMnFzqZkGNQ">
+      <img src="https://img.shields.io/badge/Slack-green?style=flat-square&logo=slack&logoColor=white" alt="Join FeatBit on Slack"/>
+    </a>
+    </div>
+    <div id="badges">
+    <a href="https://dotnet.microsoft.com/">
+      <img src="https://img.shields.io/badge/.NET-%3E=6.0-6E359E?style=flat-square&logo=csharp&logoColor=white"/>
+    </a>
+    <a href="https://www.python.org/">
+      <img src="https://img.shields.io/badge/Python-%3E=3.9-FFDD53?style=flat-square&logo=python&logoColor=white"/>
+    </a>
+    <a href="https://angular.io/">
+      <img src="https://img.shields.io/badge/Angular-16.0-DD0031?style=flat-square&logo=angular&logoColor=white"/>
+    </a>
   </div>
-  <div id="badges">
-  <a href="https://dotnet.microsoft.com/">
-    <img src="https://img.shields.io/badge/.NET-%3E=6.0-6E359E?style=flat-square&logo=csharp&logoColor=white"/>
-  </a>
-  <a href="https://www.python.org/">
-    <img src="https://img.shields.io/badge/Python-%3E=3.9-FFDD53?style=flat-square&logo=python&logoColor=white"/>
-  </a>
-  <a href="https://angular.io/">
-    <img src="https://img.shields.io/badge/Angular-16.0-DD0031?style=flat-square&logo=angular&logoColor=white"/>
-  </a>
+
+  <br/>
+  <div id="links">
+    <a href="https://docs.featbit.co">
+      Documentation
+    </a>
+    |
+    <a href="https://join.slack.com/t/featbit/shared_invite/zt-1ew5e2vbb-x6Apan1xZOaYMnFzqZkGNQ">
+      Community (Slack)
+    </a>
+    |
+    <a href="https://www.linkedin.com/company/featbit">
+      LinkedIn
+    </a>
+    |
+    <a href="mailto:contact@featbit.co">
+      Email
+    </a>
+  </div>
+
+  
 </div>
-</div>
+
+<br/>
+
 
 ## Try FeatBit Online
 
@@ -46,7 +65,7 @@ https://github.com/featbit/featbit/assets/68597908/d836702d-6096-4025-9b9e-5128a
 
 **Ship Code Safely**. Mitigate risks with Production Testing, roll out features to 1% of users initially then expanding progressively, and ensure instant error recovery without redeployment.
 
-**Targeted Experiences**. Giving you control over who sees each feature and when they see it. Release features to specific target users, and continuously measure and improve your buisness.
+**Targeted Experiences**. Giving you control over who sees each feature and when they see it. Release features to specific target users, and continuously measure and improve your business.
 
 **Innovate Faster**. Decouples code deployments from feature releases. Deploy at will, and release any feature immediately upon request from the boss.
 
@@ -76,11 +95,11 @@ Once all containers have started, you can access FeatBit's portal at [http://loc
 - Password: **123456**
 
 > **Note**
-> By default, FeatBit's portal is only accessible from the local machine where Docker Compose is running. If you want to make it publicly accessible, refer to the [**FAQ**](https://docs.featbit.co/docs/installation/faq#how-to-make-featbit-portal-accessible-publicly) for instructions.
+> By default, FeatBit's portal is only accessible from the local machine where Docker Compose is running. If you want to make it publicly accessible, refer to the [**FAQ**](https://docs.featbit.co/installation/faq#how-to-make-featbit-portal-accessible-publicly) for instructions.
 
 ### 2. Connect an SDK
 
-Find your preferred SDK in our list of [official SDKs](https://featbit.gitbook.io/sdks) and import it into your project. Follow the setup guides for your specific SDK.
+Find your preferred SDK in our list of [official SDKs](https://docs.featbit.co/sdk/overview) and import it into your project. Follow the setup guides for your specific SDK.
 
 You can also learn how to connect an SDK in the "Getting Started" section after logging in to the Portal for the first time.
 
@@ -102,9 +121,15 @@ else
 }
 ```
 
+--------
+
+🙏 If you are using FeatBit, we have launched the [**FeatBit Usage Survey**](https://forms.gle/gZT715wE9aMPpoBw8). It would be greatly appreciated and incredibly helpful if you could take the time to fill it out (5 questions).
+
+--------
+
 ## Configure and run FeatBit anywhere
 
-The above sections show you how to get up and running quickly and easily. When you're ready to start configuring and customizing FeatBit for your own environment, check out the [Installation Documentation](https://docs.featbit.co/docs/installation/full-installation), [K8s Manifest Files](https://github.com/featbit/featbit/tree/main/kubernetes) and [FeatBit Agent Documentation](https://docs.featbit.co/docs/featbit-agent/featbit-agent) for getting started with self-managed deployments, FeatBit configuration options, or running FeatBit locally via docker.
+The above sections show you how to get up and running quickly and easily. When you're ready to start configuring and customizing FeatBit for your own environment, check out the [Installation Documentation](https://docs.featbit.co/installation/full-installation), [K8s Manifest Files](https://github.com/featbit/featbit/tree/main/kubernetes) and [FeatBit Agent Documentation](https://docs.featbit.co/relay-proxy/featbit-agent) for getting started with self-managed deployments, FeatBit configuration options, or running FeatBit locally via docker.
 
 ## Documentation & Community
 
@@ -112,41 +137,51 @@ The above sections show you how to get up and running quickly and easily. When y
 
 [Join our Online Slack Support & Community](https://join.slack.com/t/featbit/shared_invite/zt-1ew5e2vbb-x6Apan1xZOaYMnFzqZkGNQ)
 
+[Connect with FeatBit on LinkedIn](https://www.linkedin.com/company/featbit)
+
+Email us at [contact@featbit.co](mailto:contact@featbit.co) if Slack isn't your thing.
+
 [Official Website](https://www.featbit.co)
 
 ## Features
 
 FeatBit offers a range of features including:
 
-- **SDKs** for [**JavaScript**](https://github.com/featbit/featbit-js-client-sdk), [**C#**](https://github.com/featbit/dotnet-server-sdk), [**Java**](https://github.com/featbit/featbit-java-sdk), [**Python**](https://github.com/featbit/featbit-python-sdk), and [**Go**](https://github.com/featbit/featbit-go-sdk), with more to come.
+- **[SDKs](https://docs.featbit.co/sdk/overview)** for [**.NET(C#)**](https://github.com/featbit/dotnet-server-sdk), [**JavaScript**](https://github.com/featbit/featbit-js-client-sdk), [**React**](https://github.com/featbit/featbit-react-client-sdk), [**NodeJs**](https://github.com/featbit/featbit-node-server-sdk), [**Java**](https://github.com/featbit/featbit-java-sdk), [**Python**](https://github.com/featbit/featbit-python-sdk), [**Go**](https://github.com/featbit/featbit-go-sdk), and [**OpenFeature Providers**](https://docs.featbit.co/sdk/overview#openfeature-providers), with more to come.
 
-- **[Managing Feature flags](https://docs.featbit.co/docs/feature-flags/organizing-flags/the-flags-list)**: Create, manage, and filter feature flags.
+- **[Managing Feature flags](https://docs.featbit.co/feature-flags/organizing-flags/the-flags-list)**: Create, manage, and filter feature flags.
 
-- **[Targeting users with flags](https://docs.featbit.co/docs/feature-flags/targeting-users-with-flags)**: Assign individual users to specific flag variations.
+- **[Targeting users with flags](https://docs.featbit.co/feature-flags/targeting-users-with-flags)**: Assign individual users to specific flag variations.
 
-- **[Reusable Segments](https://docs.featbit.co/docs/feature-flags/users-and-user-segments)**: Include or exclude users from a segment based on user attributes.
+- **[Reusable Segments](https://docs.featbit.co/feature-flags/users-and-user-segments)**: Include or exclude users from a segment based on user attributes.
 
-- **[Insights](https://docs.featbit.co/docs/feature-flags/the-flag-insights)**: Gain insights into feature usage during the rollout.
+- **[Insights](https://docs.featbit.co/feature-flags/the-flag-insights)**: Gain insights into feature usage during the rollout.
 
-- **[IAM](https://docs.featbit.co/docs/iam/about)**: Define access levels to projects, environments, or teams to enforce your policies.
+- **[IAM](https://docs.featbit.co/iam/overview)**: Define access levels to projects, environments, or teams to enforce your policies.
 
-- **[Experimentation](https://docs.featbit.co/docs/experimentation/understanding-experimentation)**: Run feature-level A/B tests anywhere in your stack to make data-driven decisions.
+- **[Experimentation](https://docs.featbit.co/experimentation/understanding-experimentation)**: Run feature-level A/B tests anywhere in your stack to make data-driven decisions.
 
-- **[Audit Log](https://docs.featbit.co/docs/feature-flags/audit-log)**: Keep track of feature flag and segment changes.
+- **[Audit Log](https://docs.featbit.co/feature-flags/audit-log)**: Keep track of feature flag and segment changes.
 
-- **[Feature Workflow](https://docs.featbit.co/docs/feature-flags/feature-workflow)**: Control your use of feature flags by creating complex automated workflows within FeatBit.
+- **[Feature Workflow](https://docs.featbit.co/feature-flags/feature-workflow)**: Control your use of feature flags by creating complex automated workflows within FeatBit (Flag Triggers, Scheduled Flag Changes, Change Approve Requests).
 
-- **[Web APIs](https://docs.featbit.co/docs/integrations/using-featbit-rest-api)**, automate your workflow with Web APIs.
+- **[Web APIs](https://docs.featbit.co/api-docs/overview)**, automate your workflow with Web APIs.
 
-- **[Platform-level](https://docs.featbit.co/docs/feature-flags/organizing-flags/projects)**, manage your flags in multiple projects and environments.
+- **[SSO](https://docs.featbit.co/integrations/single-sign-on)**, integrate with your existing Identity Provider.
 
-- **[Pro Solution for Big Data](https://docs.featbit.co/docs/tech-stack/standard-vs.-professional)**, a [professional version](https://docs.featbit.co/docs/tech-stack/architecture-professional) tailored for teams and companies to accommodate in excess of millions of daily online users with feature usage, custom events, and A/B testing insights.
+- **[Platform-level](https://docs.featbit.co/feature-flags/organizing-flags/projects)**, manage your flags in multiple projects and environments.
 
-- **[Relay Proxy/Agent](https://docs.featbit.co/docs/featbit-agent/featbit-agent)**: Host a feature flag service in your customers' private environments or reduce network latency for your end users.
+- **[Pro Solution for Big Data](https://docs.featbit.co/tech-stack/standard-vs.-professional)**, a [professional version](https://docs.featbit.co/tech-stack/architecture-professional) tailored for teams and companies to accommodate in excess of millions of daily online users with feature usage, custom events, and A/B testing insights.
 
-- **Integrations** (experimental features): Export data to third-party system monitoring services, data analytics services, workflow tools, or any other tools that can optimize your entire workflow.
+- **[Relay Proxy/Agent](https://docs.featbit.co/relay-proxy/relay-proxy)**: Host a feature flag service in your customers' private environments or reduce network latency for your end users.
 
-- **[ChatGPT Tech Debt Reduction](https://github.com/featbit/featbit/blob/doc/readme/llm/README.md)** (experimental features): Utilize ChatGPT4 and FeatBit's VSCode extension to minimize technical debt associated with feature flagging.
+- **Powerful Integrations**: Our feature-rich [WebHook](https://docs.featbit.co/integrations/webhooks) allows seamless integration with various tools and workflows: [DataDog](https://docs.featbit.co/integrations/observability/datadog), [New Relic Ones](https://docs.featbit.co/integrations/observability/newrelic), [Grafana](https://docs.featbit.co/integrations/observability/grafana), [Growthbook](https://docs.featbit.co/integrations/data-analytic/growthbook), [Slack](https://docs.featbit.co/integrations/chat-apps/slack) and more.
+
+- **[ChatGPT Tech Debt Reduction](https://github.com/featbit/featbit/tree/main/llm)** (experimental features): Utilize ChatGPT4 and FeatBit's VSCode extension to minimize technical debt associated with feature flagging.
+
+- **[OpenTelemetry Integration](https://docs.featbit.co/integrations/observability/opentelemetry)**: Enhance system visibility with OpenTelemetry for logs, traces, and metrics.
+
+- **[Helm Charts Installation](https://github.com/featbit/featbit-charts/)**, FeatBit can be installed on-premises, in the cloud, or in a hybrid environment through Helm Charts.
 
 ![featbit-readme-new-2](https://user-images.githubusercontent.com/68597908/211645725-391777fa-b5c0-4a0c-88e9-df9f05af9c61.gif)
 
@@ -158,43 +193,21 @@ Building FeatBit is a collaborative effort, and we owe much gratitude to many in
 
 ### Contributors
 
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/cosmos-explorer"><img src="https://avatars.githubusercontent.com/u/88151306?v=4?s=100" width="100px;" alt="cosmos-explorer"/><br /><sub><b>cosmos-explorer</b></sub></a><br /><a href="#userTesting-cosmos-explorer" title="User Testing">📓</a> <a href="https://github.com/featbit/featbit/commits?author=cosmos-explorer" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/deleteLater"><img src="https://avatars.githubusercontent.com/u/34052208?v=4?s=100" width="100px;" alt="deleteLater"/><br /><sub><b>deleteLater</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=deleteLater" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/dsun0720"><img src="https://avatars.githubusercontent.com/u/38680131?v=4?s=100" width="100px;" alt="s2002a"/><br /><sub><b>s2002a</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=dsun0720" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/FeatBit"><img src="https://avatars.githubusercontent.com/u/68597908?v=4?s=100" width="100px;" alt="Comiscience"/><br /><sub><b>Comiscience</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=cosmic-flood" title="Documentation">📖</a><a href="https://github.com/featbit/featbit/commits?author=cosmic-flood" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/san-ki"><img src="https://avatars.githubusercontent.com/u/66792330?v=4?s=100" width="100px;" alt="Sanket"/><br /><sub><b>Sanket</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=san-ki" title="Code">💻</a><a href="https://github.com/featbit/featbit/commits?author=san-ki" title="Medal">🥇</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/sagar110599"><img src="https://avatars.githubusercontent.com/u/46983757?v=4?s=100" width="100px;" alt="sagar110599"/><br /><sub><b>sagar110599</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=sagar110599" title="Code">💻</a><a href="https://github.com/featbit/featbit/commits?author=sagar110599" title="Medal">🥇</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/DaveFz"><img src="https://avatars.githubusercontent.com/u/47706547?v=4?s=100" width="100px;" alt="Dave"/><br /><sub><b>Dave</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=DaveFz" title="Code">💻</a><a href="https://github.com/featbit/featbit/commits?author=DaveFz" title="Medal">🥇</a></td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://www.linkedin.com/in/kabirhasan/"><img src="https://avatars.githubusercontent.com/u/29860651?v=4?s=100" width="100px;" alt="Kabir Hasan"/><br /><sub><b>Kabir Hasan</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=kabir-webDev" title="Code">💻</a><a href="https://github.com/featbit/featbit/commits?author=kabir-webDev" title="Medal">🥇</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Michaelg22"><img src="https://avatars.githubusercontent.com/u/62085623?v=4?s=100" width="100px;" alt="MikeG"/><br /><sub><b>MikeG</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=Michaelg22" title="Code">💻</a><a href="https://github.com/featbit/featbit/commits?author=Michaelg22" title="Medal">🥇</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://michaelyuhe.zeabur.app/"><img src="https://avatars.githubusercontent.com/u/63531512?v=4?s=100" width="100px;" alt="夏宇航"/><br /><sub><b>夏宇航</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=MichaelYuhe" title="Code">💻</a><a href="https://github.com/featbit/featbit/commits?author=MichaelYuhe" title="Medal">🥇</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://linktr.ee/exilon"><img src="https://avatars.githubusercontent.com/u/80382462?v=4?s=100" width="100px;" alt="Exilon"/><br /><sub><b>Exilon</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=Exilon24" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/fMoro1999"><img src="https://avatars.githubusercontent.com/u/49589241?v=4?s=100" width="100px;" alt="Francesco Moro"/><br /><sub><b>Francesco Moro</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=fMoro1999" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="http://webstaurantstore.com"><img src="https://avatars.githubusercontent.com/u/128187904?v=4?s=100" width="100px;" alt="rbrennan"/><br /><sub><b>rbrennan</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=wss-rbrennan" title="Code">💻</a><a href="https://github.com/featbit/featbit/commits?author=wss-rbrennan" title="Medal">🥇</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/mucoban"><img src="https://avatars.githubusercontent.com/u/80916997?v=4?s=100" width="100px;" alt="Mücahit Çoban"/><br /><sub><b>Mücahit Çoban</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=mucoban" title="Code">💻</a></td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Shubh8899"><img src="https://avatars.githubusercontent.com/u/63413220?v=4?s=100" width="100px;" alt="Shubham Chauhan"/><br /><sub><b>Shubham Chauhan</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=Shubh8899" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/defqd"><img src="https://avatars.githubusercontent.com/u/104916752?v=4?s=100" width="100px;" alt="defqd"/><br /><sub><b>defqd</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=defqd" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/benirave"><img src="https://avatars.githubusercontent.com/u/23312114?v=4?s=100" width="100px;" alt="Bence Eros"/><br /><sub><b>Bence Eros</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=benirave" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/LeeBingler"><img src="https://avatars.githubusercontent.com/u/98109693?v=4?s=100" width="100px;" alt="Bingler Lee"/><br /><sub><b>Bingler Lee</b></sub></a><br /><a href="https://github.com/featbit/featbit/commits?author=LeeBingler" title="Code">💻</a></td>
-    </tr>
-  </tbody>
-</table>
+We would like to express our gratitude to all the individuals who have already contributed to FeatBit!
 
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
+<a href="https://github.com/featbit/featbit/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=featbit/featbit" />
+</a>
 
-<!-- ALL-CONTRIBUTORS-LIST:END -->
+Made with [contrib.rocks](https://contrib.rocks).
 
 ## License
 
-FeatBit is under the MIT license. See the [LICENSE](https://github.com/featbit/featbit/blob/main/LICENSE) file for details.
+FeatBit is an Open Core product. The bulk of the code is under permissive MIT license. See the [LICENSE](https://github.com/featbit/featbit/blob/main/LICENSE) file for details.
+
+The following listed features are protected by a commercial license key, please contact us by [Slack](https://join.slack.com/t/featbit/shared_invite/zt-1ew5e2vbb-x6Apan1xZOaYMnFzqZkGNQ) or [Email](mailto:contact@featbit.co) to get a license key or a trial license key:
+- Schedule
+- Change request
+- SSO
+- Multi-organizations
+

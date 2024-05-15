@@ -67,10 +67,8 @@ import { NzCardModule } from "ng-zorro-antd/card";
 import { TranslationPipe } from "@core/pipes/translation.pipe";
 import { NzTypographyModule } from "ng-zorro-antd/typography";
 import { RuleVariationValuePipe } from "@core/components/find-rule/serve/rule-variation-value.pipe";
-import { SafeHtmlPipe } from "@core/pipes/safe-html.pipe";
 import { SlugifyPipe } from "@core/pipes/slugify";
 import { AuditLogComponent } from "@core/components/audit-log/audit-log.component";
-import { ChangeListComponent } from "@core/components/change-list/change-list.component";
 import { AuditLogsComponent } from "@core/components/audit-logs/audit-logs.component";
 import { NzDatePickerModule } from "ng-zorro-antd/date-picker";
 import { NzEmptyModule } from "ng-zorro-antd/empty";
@@ -87,17 +85,26 @@ import { PrismComponent } from './components/prism/prism.component';
 import { RelayProxyDrawerComponent } from "@core/components/relay-proxy-drawer/relay-proxy-drawer.component";
 import { FeatureFlagDrawerComponent } from "@core/components/feature-flag-drawer/feature-flag-drawer.component";
 import { NzSwitchModule } from "ng-zorro-antd/switch";
+import {
+  PendingChangesDrawerComponent
+} from "@core/components/pending-changes-drawer/pending-changes-drawer.component";
+import { ChangeListModule } from "@core/components/change-list/change-list.module";
+import { PipesModule } from "@core/pipes/pipes.module";
+import { LicenseComponent } from "@core/components/license/license.component";
+import { WebhookDrawerComponent } from './components/webhook-drawer/webhook-drawer.component';
+import { HandlebarsService } from "@services/handlebars.service";
+import { TestWebhookModalComponent } from './components/test-webhook-modal/test-webhook-modal.component';
+import { WebhookDeliveryComponent } from './components/webhook-delivery/webhook-delivery.component';
+import { NzSkeletonModule } from "ng-zorro-antd/skeleton";
+import { WebhookDeliveriesComponent } from './components/webhook-deliveries/webhook-deliveries.component';
+import { NzSegmentedModule } from "ng-zorro-antd/segmented";
+import { ResourceFinderComponent } from './components/resource-finder/resource-finder.component';
+import { ImportUserComponent } from './components/import-user/import-user.component';
+import { EndUserDrawerComponent } from './components/end-user-drawer/end-user-drawer.component';
+import { NzDescriptionsModule } from "ng-zorro-antd/descriptions";
 
 @NgModule({
   declarations: [
-    SlugifyPipe,
-    PercentagePipe,
-    SafeHtmlPipe,
-    PolicyTypePipe,
-    AccessTokenTypePipe,
-    AccessTokenStatusPipe,
-    TranslationPipe,
-    RuleVariationValuePipe,
     PermissionCheckDirective,
     LocaleSwitcherComponent,
     MemberDrawerComponent,
@@ -106,6 +113,7 @@ import { NzSwitchModule } from "ng-zorro-antd/switch";
     PolicyDrawerComponent,
     OrganizationDrawerComponent,
     EnvDrawerComponent,
+    PendingChangesDrawerComponent,
     PermissionCheckComponent,
     ProjectDrawerComponent,
     MenuComponent,
@@ -125,11 +133,18 @@ import { NzSwitchModule } from "ng-zorro-antd/switch";
     GuideComponent,
     AuditLogsComponent,
     AuditLogComponent,
-    ChangeListComponent,
     ChangeReviewComponent,
     AccessTokenDrawerComponent,
     RelayProxyDrawerComponent,
-    PrismComponent
+    PrismComponent,
+    LicenseComponent,
+    WebhookDrawerComponent,
+    TestWebhookModalComponent,
+    WebhookDeliveryComponent,
+    WebhookDeliveriesComponent,
+    ResourceFinderComponent,
+    ImportUserComponent,
+    EndUserDrawerComponent
   ],
   imports: [
     CommonModule,
@@ -137,6 +152,7 @@ import { NzSwitchModule } from "ng-zorro-antd/switch";
     OverlayModule,
     ReactiveFormsModule,
     RouterModule,
+    PipesModule,
     NzFormModule,
     NzIconModule,
     NzMenuModule,
@@ -176,20 +192,23 @@ import { NzSwitchModule } from "ng-zorro-antd/switch";
     NzBreadCrumbModule,
     NzInputNumberModule,
     NzCollapseModule,
-    NzSwitchModule
+    NzSwitchModule,
+    ChangeListModule,
+    NzSkeletonModule,
+    NzSegmentedModule,
+    NzDescriptionsModule
   ],
   exports: [
-    CommonModule,
-    ReactiveFormsModule,
-    FormsModule,
     SlugifyPipe,
     PercentagePipe,
-    SafeHtmlPipe,
     PolicyTypePipe,
     AccessTokenTypePipe,
     AccessTokenStatusPipe,
     TranslationPipe,
     RuleVariationValuePipe,
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
     PermissionCheckDirective,
     LocaleSwitcherComponent,
     MemberDrawerComponent,
@@ -198,6 +217,7 @@ import { NzSwitchModule } from "ng-zorro-antd/switch";
     PolicyDrawerComponent,
     OrganizationDrawerComponent,
     EnvDrawerComponent,
+    PendingChangesDrawerComponent,
     PermissionCheckComponent,
     ProjectDrawerComponent,
     FeatureFlagDrawerComponent,
@@ -217,11 +237,22 @@ import { NzSwitchModule } from "ng-zorro-antd/switch";
     GuideComponent,
     AuditLogsComponent,
     AuditLogComponent,
-    ChangeListComponent,
     ChangeReviewComponent,
     AccessTokenDrawerComponent,
     RelayProxyDrawerComponent,
-    PrismComponent
+    PrismComponent,
+    LicenseComponent,
+    WebhookDrawerComponent,
+    TestWebhookModalComponent,
+    WebhookDeliveryComponent,
+    WebhookDeliveriesComponent,
+    ResourceFinderComponent,
+    ImportUserComponent,
+    EndUserDrawerComponent
   ]
 })
-export class CoreModule { }
+export class CoreModule {
+  constructor(handlebars: HandlebarsService) {
+    handlebars.init();
+  }
+}

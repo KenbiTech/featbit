@@ -1,10 +1,9 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { IRuleIdDispatchKey } from '@shared/types';
+import { IRuleIdDispatchKey, IUserProp, IUserType, License, LicenseFeatureEnum } from '@shared/types';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { EnvUserService } from '@services/env-user.service';
-import { IUserProp, IUserType } from '@shared/types';
 import { MessageQueueService } from '@services/message-queue.service';
 import { EnvUserPropService } from "@services/env-user-prop.service";
 import { USER_IS_IN_SEGMENT_USER_PROP, USER_IS_NOT_IN_SEGMENT_USER_PROP } from "@shared/constants";
@@ -13,9 +12,11 @@ import { FeatureFlag, IFeatureFlag } from "@features/safe/feature-flags/types/de
 import { ICondition, IRule, IRuleVariation } from "@shared/rules";
 import { FeatureFlagService } from "@services/feature-flag.service";
 import { isSegmentCondition, isSingleOperator, uuidv4 } from "@utils/index";
-import { SegmentService } from "@services/segment.service";
-import {RefTypeEnum} from "@core/components/audit-log/types";
-import {ISegment} from "@features/safe/segments/types/segments-index";
+import { RefTypeEnum } from "@core/components/audit-log/types";
+import { ChangeReviewOutput, ReviewModalKindEnum, ReviewModalMode } from "@core/components/change-review/types";
+import { IPendingChanges } from "@core/components/pending-changes-drawer/types";
+import { environment } from "src/environments/environment";
+import { getCurrentLicense } from "@utils/project-env";
 
 enum FlagValidationErrorKindEnum {
   fallthrough = 0,
@@ -38,13 +39,14 @@ export class TargetingComponent implements OnInit {
     return rule.id;
   }
 
-  public featureFlag: FeatureFlag = {} as FeatureFlag;
-  public userList: IUserType[] = [];
+  license: License;
+  featureFlag: FeatureFlag = {} as FeatureFlag;
+  userList: IUserType[] = [];
 
   userProps: IUserProp[];
-  public key: string;
-  public isLoading: boolean = true;
-  public isTargetUsersActive: boolean = false;
+  key: string;
+  isLoading: boolean = true;
+  isTargetUsersActive: boolean = false;
 
   exptRulesVisible = false;
 
@@ -62,49 +64,44 @@ export class TargetingComponent implements OnInit {
     this.exptRulesVisible = false;
   }
 
+  reviewModalKind: ReviewModalKindEnum;
   originalData: string = '{}';
   currentData: string = '{}';
   refType: RefTypeEnum = RefTypeEnum.Flag;
   reviewModalVisible: boolean = false;
-  allTargetingUsers: IUserType[] = []; // including all users who have been added or removed from the targeting user in the UI, is used by the differ
-  segmentIdRefs: ISegment[] = [];
 
-  onReviewChanges(validationErrortpl: TemplateRef<void>) {
+
+  onScheduleClick(validationErrortpl: TemplateRef<void>) {
+    if (!this.license.isGranted(LicenseFeatureEnum.Schedule)) {
+      return false;
+    }
+
+    return this.onReviewChanges(validationErrortpl, ReviewModalKindEnum.Schedule);
+  }
+
+  onChangeRequestClick(validationErrortpl: TemplateRef<void>) {
+    if (!this.license.isGranted(LicenseFeatureEnum.ChangeRequest)) {
+      return false;
+    }
+
+    return this.onReviewChanges(validationErrortpl, ReviewModalKindEnum.ChangeRequest);
+  }
+
+  onReviewChanges(validationErrortpl: TemplateRef<void>, modalKind: ReviewModalKindEnum) {
     this.validationErrors = this.validateFeatureFlag();
 
     if (this.validationErrors.length > 0) {
-      console.log(this.validationErrors);
       this.msg.create('', validationErrortpl, { nzDuration: 5000 });
       return false;
     }
 
-    this.featureFlag.targetUsers = Object.keys(this.targetingUsersByVariation).map(variationId => ({variationId, keyIds: this.targetingUsersByVariation[variationId].map(tu => tu.keyId)}));
+    this.reviewModalKind = modalKind;
 
+    this.featureFlag.targetUsers = Object.keys(this.targetingUsersByVariation).map(variationId => ({variationId, keyIds: this.targetingUsersByVariation[variationId].map(tu => tu.keyId)}));
     this.originalData = JSON.stringify(this.featureFlag.originalData);
     this.currentData = JSON.stringify(this.featureFlag);
 
-    // get all segmentIds from originalData and new Data
-    const previousSegmentIdRefs: string[] = this.featureFlag.originalData.rules.flatMap((rule) => rule.conditions)
-      .filter((condition) => isSegmentCondition(condition) && condition.value.length > 0)
-      .flatMap((condition: ICondition) => JSON.parse(condition.value))
-      .filter((id) => id !== null && id.length > 0);
-
-    const currentSegmentIdRefs: string[] = this.featureFlag.rules.flatMap((rule) => rule.conditions)
-      .filter((condition) => isSegmentCondition(condition) && condition.value.length > 0)
-      .flatMap((condition: ICondition) => JSON.parse(condition.value))
-      .filter((id) => id !== null && id.length > 0);
-
-    let segmentIdRefs: string[] = [...previousSegmentIdRefs, ...currentSegmentIdRefs];
-    segmentIdRefs = segmentIdRefs.filter((id, idx) => segmentIdRefs.indexOf(id) === idx); // get unique values
-
-    if (segmentIdRefs.length > 0) {
-      this.segmentService.getByIds(segmentIdRefs).subscribe((segments) => {
-        this.segmentIdRefs = segments;
-        this.reviewModalVisible = true;
-      }, _ => this.msg.error($localize `:@@common.operation-failed-try-again:Operation failed, please try again`));
-    } else {
-      this.reviewModalVisible = true;
-    }
+    this.reviewModalVisible = true
   }
 
   onCloseReviewModal() {
@@ -114,15 +111,15 @@ export class TargetingComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private featureFlagService: FeatureFlagService,
-    private segmentService: SegmentService,
     private envUserService: EnvUserService,
     private envUserPropService: EnvUserPropService,
     private msg: NzMessageService,
     private messageQueueService: MessageQueueService
-  ) {
-  }
+  ) { }
 
   ngOnInit(): void {
+    this.license = getCurrentLicense();
+
     this.isLoading = true;
     this.route.paramMap.subscribe(paramMap => {
       this.key = decodeURIComponent(paramMap.get('key'));
@@ -145,11 +142,33 @@ export class TargetingComponent implements OnInit {
   }
 
   async loadData() {
-    await Promise.all([this.loadUserPropsData(), this.loadFeatureFlag()]);
+    await Promise.all([this.loadUserPropsData(), this.loadFeatureFlag(), this.loadPendingChangesList()]);
     this.isLoading = false;
   }
 
-  public targetingUsersByVariation: { [key: string]: IUserType[] } = {}; // {variationId: users}
+  targetingUsersByVariation: { [key: string]: IUserType[] } = {}; // {variationId: users}
+
+  pendingChangesDrawerVisible: boolean = false;
+  pendingChangesList: IPendingChanges[] = [];
+  private async loadPendingChangesList() {
+    try {
+      this.pendingChangesList = await this.featureFlagService.getPendingChanges(this.key);
+    } catch (err) {
+      this.msg.error($localize`:@@common.loading-pending-changes-failed:Loading pending changes failed`);
+    }
+  }
+
+  onPendingChangesRemoved(scheduleId: string) {
+    this.pendingChangesList = this.pendingChangesList.filter(x => x.id !== scheduleId);
+  }
+
+  openPendingChangesDrawer() {
+    this.pendingChangesDrawerVisible = true;
+  }
+
+  onPendingChangesDrawerClosed() {
+    this.pendingChangesDrawerVisible = false;
+  }
 
   loadFeatureFlag() {
     return new Promise((resolve) => {
@@ -168,8 +187,6 @@ export class TargetingComponent implements OnInit {
               return acc;
             }, {});
 
-            this.allTargetingUsers = Object.values(this.targetingUsersByVariation).flatMap((x) => x);
-
             resolve(null);
           }, () => resolve(null));
         } else {
@@ -177,8 +194,6 @@ export class TargetingComponent implements OnInit {
             acc[cur.id] = [];
             return acc;
           }, {});
-
-          this.allTargetingUsers = Object.values(this.targetingUsersByVariation).flatMap((x) => x);
 
           resolve(null);
         }
@@ -220,11 +235,11 @@ export class TargetingComponent implements OnInit {
     });
   }
 
-  public onDeleteRule(ruleId: string) {
+  onDeleteRule(ruleId: string) {
     this.featureFlag.rules = this.featureFlag.rules.filter(rule => rule.id !== ruleId);
   }
 
-  public onAddRule() {
+  onAddRule() {
     this.featureFlag.rules.push({
       id: uuidv4(),
       name: ($localize `:@@common.rule:Rule`) + ' ' + (this.featureFlag.rules.length + 1),
@@ -234,7 +249,7 @@ export class TargetingComponent implements OnInit {
     } as IRule);
   }
 
-  public onRuleConditionChange(conditions: ICondition[], ruleId: string) {
+  onRuleConditionChange(conditions: ICondition[], ruleId: string) {
     this.featureFlag.rules = this.featureFlag.rules.map(rule => {
       if (rule.id === ruleId) {
         rule.conditions = conditions.map(condition => {
@@ -255,13 +270,8 @@ export class TargetingComponent implements OnInit {
     })
   }
 
-  public onSelectedUserListChange(data: IUserType[], variationId: string) {
+  onSelectedUserListChange(data: IUserType[], variationId: string) {
     this.targetingUsersByVariation[variationId] = [...data];
-
-    this.allTargetingUsers = [
-      ...this.allTargetingUsers.filter((u) => !data.find((d) => d.keyId === u.keyId)),
-      ...data
-    ];
   }
 
   onFallthroughChange(value: IRuleVariation[]) {
@@ -284,13 +294,14 @@ export class TargetingComponent implements OnInit {
 
   validationErrors: IFlagValidationError[] = [];
 
-  onSave(data: any) {
+  onSave(data: ChangeReviewOutput) {
     this.isLoading = true;
 
     const { key, rules, fallthrough, exptIncludeAllTargets } = this.featureFlag;
     const targetUsers = this.featureFlag.targetUsers.filter(x => x.keyIds.length > 0);
+    const targeting = { key, targetUsers, rules, fallthrough, exptIncludeAllTargets };
 
-    this.featureFlagService.updateTargeting({ key, targetUsers, rules, fallthrough, exptIncludeAllTargets, comment: data.comment }).subscribe({
+    const observer = {
       next: () => {
         this.loadData();
         this.msg.success($localize `:@@common.save-success:Saved Successfully`);
@@ -300,7 +311,17 @@ export class TargetingComponent implements OnInit {
         this.msg.error($localize `:@@common.save-fail:Failed to Save`);
         this.isLoading = false;
       }
-    });
+    };
+
+    if (!ReviewModalMode.isScheduleEnabled(this.reviewModalKind) && !ReviewModalMode.isChangeRequestEnabled(this.reviewModalKind)) {
+      this.featureFlagService.updateTargeting(targeting, data.comment).subscribe(observer);
+    } else if (ReviewModalMode.isScheduleEnabled(this.reviewModalKind)) { // schedule (with or without change request)
+      this.featureFlagService.createSchedule(targeting, data.schedule.scheduledTime, data.schedule.title, data.changeRequest?.reviewers, data.changeRequest?.reason, ReviewModalMode.isChangeRequestEnabled(this.reviewModalKind)).subscribe(observer);
+    } else if (ReviewModalMode.isChangeRequestEnabled(this.reviewModalKind)){ // change request only
+      this.featureFlagService.createChangeRequest(targeting, data.changeRequest.reviewers, data.changeRequest.reason).subscribe(observer);
+    } else {
+      // error
+    }
 
     this.reviewModalVisible = false;
   }
@@ -346,8 +367,8 @@ export class TargetingComponent implements OnInit {
     this.featureFlag.rules.filter(f => f.conditions.length > 0).forEach((rule: IRule) => {
       const invalidCondition = rule.conditions.some((condition) =>
         condition.property?.length === 0 || // property must be set
-        (isSegmentCondition(condition) && JSON.parse(condition.value).length === 0) || // segment condition's value must be set
-        (!isSegmentCondition(condition) && condition.op?.length === 0) || // non segment condition's operation must be set if not segment
+        (isSegmentCondition(condition.property) && JSON.parse(condition.value).length === 0) || // segment condition's value must be set
+        (!isSegmentCondition(condition.property) && condition.op?.length === 0) || // non segment condition's operation must be set if not segment
         (!isSingleOperator(condition.op) && (condition.type === 'multi' ? JSON.parse(condition.value).length === 0 : condition.value?.length === 0)) // value must be set for non-single operator
       );
 
@@ -375,7 +396,7 @@ export class TargetingComponent implements OnInit {
     return validationErrs.filter((err, idx) => idx === validationErrs.findIndex((it) => it.kind === err.kind && it.ids.sort().join('') === err.ids.sort().join(''))); // return only unique values
   }
 
-  public onRuleVariationsChange(value: IRuleVariation[], ruleId: string) {
+  onRuleVariationsChange(value: IRuleVariation[], ruleId: string) {
     this.featureFlag.rules = this.featureFlag.rules.map(rule => {
       if (rule.id === ruleId) {
         rule.variations = [...value];
@@ -385,7 +406,11 @@ export class TargetingComponent implements OnInit {
     })
   }
 
-  public onDragEnd(event: CdkDragDrop<string[]>) {
+  onDragEnd(event: CdkDragDrop<string[]>) {
     moveItemInArray(this.featureFlag.rules, event.previousIndex, event.currentIndex);
   }
+
+  protected readonly environment = environment;
+  protected readonly LicenseFeatureEnum = LicenseFeatureEnum;
+  protected readonly ReviewModalKindEnum = ReviewModalKindEnum;
 }

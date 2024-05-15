@@ -1,18 +1,22 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { IAuthProps, IOrganization, IProject, IEnvironment, IProjectEnv, SecretTypeEnum } from '@shared/types';
+import {
+  IProfile,
+  IOrganization,
+  IProject,
+  IEnvironment,
+  IProjectEnv,
+  SecretTypeEnum,
+  License
+} from '@shared/types';
 import { ProjectService } from '@services/project.service';
 import { Router } from '@angular/router';
 import { Breadcrumb, BreadcrumbService } from '@services/bread-crumb.service';
-import { PermissionsService } from "@services/permissions.service";
-import { permissionActions } from "@shared/policy";
 import { NzMessageService } from "ng-zorro-antd/message";
 import { MessageQueueService } from "@services/message-queue.service";
 import { Observable } from "rxjs";
 import { copyToClipboard } from '@utils/index';
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { FeedbackService } from "@services/feedback.service";
 import { EnvService } from '@core/services/env.service';
-import { getCurrentOrganization, getCurrentProjectEnv } from "@utils/project-env";
+import { getCurrentLicense, getCurrentOrganization, getCurrentProjectEnv } from "@utils/project-env";
 
 @Component({
   selector: 'app-header',
@@ -21,12 +25,13 @@ import { getCurrentOrganization, getCurrentProjectEnv } from "@utils/project-env
 })
 export class HeaderComponent implements OnInit {
 
-  @Input() auth: IAuthProps;
+  @Input() profile: IProfile;
 
   protected readonly SecretTypeEnum = SecretTypeEnum;
 
   currentProjectEnv: IProjectEnv;
   currentOrganization: IOrganization;
+  license: License;
 
   allProjects: IProject[] = [];
   selectedProject: IProject;
@@ -43,19 +48,11 @@ export class HeaderComponent implements OnInit {
     private router: Router,
     private projectService: ProjectService,
     private message: NzMessageService,
-    private fb: FormBuilder,
-    private feedbackService: FeedbackService,
-    private readonly breadcrumbService: BreadcrumbService,
-    private permissionsService: PermissionsService,
+    private breadcrumbService: BreadcrumbService,
     private messageQueueService: MessageQueueService,
     private envService: EnvService
   ) {
     this.breadcrumbs$ = breadcrumbService.breadcrumbs$;
-
-    this.feedbackForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      message: ['', [Validators.required]]
-    });
   }
 
   async ngOnInit() {
@@ -109,7 +106,7 @@ export class HeaderComponent implements OnInit {
       envId: this.selectedEnv.id,
       envKey: this.selectedEnv.key,
       envName: this.selectedEnv.name,
-      envSecret: this.selectedEnv.secrets[0].value
+      envSecrets: this.selectedEnv.secrets
     };
 
     this.projectService.upsertCurrentProjectEnvLocally(projectEnv);
@@ -146,6 +143,7 @@ export class HeaderComponent implements OnInit {
   private setSelectedProjectEnv() {
     this.currentOrganization = getCurrentOrganization();
     this.currentProjectEnv = getCurrentProjectEnv();
+    this.license = getCurrentLicense();
 
     this.setCurrentEnv();
 
@@ -165,44 +163,9 @@ export class HeaderComponent implements OnInit {
   }
 
   // copy environment key
-  copyText(event, text: string) {
+  copyText(text: string) {
     copyToClipboard(text).then(
       () => this.message.success($localize`:@@common.copy-success:Copied`)
     );
-  }
-
-  // feedback
-  feedbackModalVisible = false;
-  sendingFeedback = false;
-  feedbackForm: FormGroup;
-
-  openFeedbackModal() {
-    this.feedbackModalVisible = true;
-    this.feedbackForm.reset();
-  }
-
-  sendFeedback() {
-    if (this.feedbackForm.invalid) {
-      for (const i in this.feedbackForm.controls) {
-        this.feedbackForm.controls[i].markAsDirty();
-        this.feedbackForm.controls[i].updateValueAndValidity();
-      }
-    }
-
-    this.sendingFeedback = true;
-    const {email, message} = this.feedbackForm.value;
-
-    this.feedbackService.sendFeedback(email, message).subscribe({
-      next: () => {
-        this.message.success($localize`:@@common.feedback-success-message:Thank you for sending us your feedback, we'll get back to you very soon!`);
-      },
-      error: () => {
-        this.message.error($localize`:@@common.feedback-failure-message:We were not able to send your feedback, Please try again!`);
-      },
-      complete: () => {
-        this.sendingFeedback = false;
-        this.feedbackModalVisible = false;
-      }
-    });
   }
 }

@@ -11,11 +11,33 @@ namespace Infrastructure.Organizations;
 
 public class OrganizationService : MongoDbService<Organization>, IOrganizationService
 {
-    public OrganizationService(MongoDbClient mongoDb) : base(mongoDb)
+    private readonly IProjectService _projectService;
+
+    public OrganizationService(MongoDbClient mongoDb, IProjectService projectService) : base(mongoDb)
     {
+        _projectService = projectService;
     }
 
-    public async Task<IEnumerable<Organization>> GetListAsync(Guid userId)
+    public async Task<string[]> GetScopesAsync(ScopeString[] scopeStrings)
+    {
+        var projectIds = scopeStrings.Select(x => x.ProjectId);
+        var envIds = scopeStrings.SelectMany(x => x.EnvIds);
+
+        var projects =
+            await MongoDb.QueryableOf<Project>().Where(x => projectIds.Contains(x.Id)).ToListAsync();
+        var environments =
+            await MongoDb.QueryableOf<Environment>().Where(x => envIds.Contains(x.Id)).ToListAsync();
+
+        var aggregation =
+            from scopeString in scopeStrings
+            let project = projects.FirstOrDefault(x => x.Id == scopeString.ProjectId)
+            let envs = environments.Where(x => scopeString.EnvIds.Contains(x.Id))
+            select $"{project?.Name}/{string.Join(',', envs.Select(x => x.Name))}";
+
+        return aggregation.ToArray();
+    }
+
+    public async Task<ICollection<Organization>> GetListAsync(Guid userId)
     {
         var organizations = MongoDb.QueryableOf<Organization>();
         var users = MongoDb.QueryableOf<OrganizationUser>();
@@ -103,13 +125,11 @@ public class OrganizationService : MongoDbService<Organization>, IOrganizationSe
         await MongoDb.CollectionOf<Group>().DeleteManyAsync(x => x.OrganizationId == id);
         await MongoDb.CollectionOf<GroupMember>().DeleteManyAsync(x => x.OrganizationId == id);
 
-        // delete projects & related environments
+        // delete projects
         var projectIds = await MongoDb.QueryableOf<Project>()
             .Where(x => x.OrganizationId == id)
             .Select(x => x.Id)
             .ToListAsync();
-
-        await MongoDb.CollectionOf<Project>().DeleteManyAsync(x => projectIds.Contains(x.Id));
-        await MongoDb.CollectionOf<Environment>().DeleteManyAsync(x => projectIds.Contains(x.ProjectId));
+        await _projectService.DeleteManyAsync(projectIds);
     }
 }

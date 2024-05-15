@@ -1,6 +1,6 @@
 <section class="body-container">
   <div class="detail-body">
-    <div class="banner">
+    <div class="banner" *ngIf="!isLoading">
       <!-- a placeholder, do not delete it -->
       <div *ngIf="featureFlag.isEnabled"></div>
       <div class="warning" *ngIf="!featureFlag.isEnabled">
@@ -8,14 +8,37 @@
         <ng-container i18n="@@ff.components.details.targeting.settings-ineffective-warning">Following settings won't be effective until you turn the flag on</ng-container>
       </div>
       <div class="action-btns">
-        <button nz-button nzType="primary" (click)="onSetExptRulesClick()">
-          <i nz-icon nzType="filter" nzTheme="outline"></i>
-          <ng-container i18n="@@ff.components.details.targeting.setabtestrule">Set A/B test rule</ng-container>
+        <button class="pending-changes" (click)="openPendingChangesDrawer()">
+          <i nz-icon nzType="field-time" nzTheme="outline"></i>
+          <span>{{pendingChangesList.length}}</span>
         </button>
-        <button nz-button nzType="primary" class="save-btn" (click)="onReviewChanges(validationErrorTpl)">
+        <button class="save" nz-button nzType="primary" (click)="onReviewChanges(validationErrorTpl, ReviewModalKindEnum.Save)">
           <i nz-icon nzType="icons:icon-save"></i>
           <ng-container i18n="@@common.save">Save</ng-container>
         </button>
+        <button class="more-action" nz-dropdown [nzDropdownMenu]="menu" nzOverlayClassName="target-more-actions">
+          <i nz-icon nzType="icons:icon-menu"></i>
+        </button>
+        <nz-dropdown-menu #menu="nzDropdownMenu">
+          <ul nz-menu>
+            <ng-template #needLicenseTooltip>
+              <ng-container i18n="@@common.need-license">You don't have a license or your current license doesn't grant this feature, please contact FeatBit team to get a license.</ng-container>
+            </ng-template>
+            <li [class]="{disabled: !license?.isGranted(LicenseFeatureEnum.Schedule)}" nz-menu-item
+                (click)="onScheduleClick(validationErrorTpl)">
+              <span *ngIf="license?.isGranted(LicenseFeatureEnum.Schedule)" i18n="@@common.schedule-changes">Schedule changes</span>
+              <span *ngIf="!license?.isGranted(LicenseFeatureEnum.Schedule)" [nz-tooltip]="needLicenseTooltip" i18n="@@common.schedule-changes">Schedule changes</span>
+            </li>
+            <li [class]="{disabled: !license?.isGranted(LicenseFeatureEnum.ChangeRequest)}" nz-menu-item
+                (click)="onChangeRequestClick(validationErrorTpl)">
+              <span *ngIf="license?.isGranted(LicenseFeatureEnum.ChangeRequest)" i18n="@@common.change-request">Change Request</span>
+              <span *ngIf="!license?.isGranted(LicenseFeatureEnum.ChangeRequest)" [nz-tooltip]="needLicenseTooltip" i18n="@@common.change-request">Change Request</span>
+            </li>
+            <li nz-menu-item
+                (click)="onSetExptRulesClick()"
+                i18n="@@ff.components.details.targeting.setabtestrule">Set A/B test rule</li>
+          </ul>
+        </nz-dropdown-menu>
       </div>
     </div>
 
@@ -27,7 +50,7 @@
             <ng-template #defaultTooltip>
               <ng-container i18n="@@ff.components.details.targeting.default-tooltip">Serve a variation if the user doesn't met Individual targeting or Targeting Rules.</ng-container>
               <br>
-              <a target="_blank" href="https://featbit.gitbook.io/docs/feature-flags/targeting-users-with-flags/targeting-rules#setting-the-default-rule" i18n="@@common.check.the.docs">Check the docs</a>
+              <a target="_blank" href="https://docs.featbit.co/feature-flags/targeting-users-with-flags/targeting-rules#setting-the-default-rule" i18n="@@common.check.the.docs">Check the docs</a>
             </ng-template>
           </i>
         </div>
@@ -55,7 +78,7 @@
             <ng-template #individualTooltip>
               <ng-container i18n="@@ff.components.details.targeting.individual-tooltip">Serve a variation to specific targets based on their key</ng-container>
               <br>
-              <a target="_blank" href="https://featbit.gitbook.io/docs/feature-flags/targeting-users-with-flags/individual-user-targeting" i18n="@@common.check.the.docs">Check the docs</a>
+              <a target="_blank" href="https://docs.featbit.co/feature-flags/targeting-users-with-flags/individual-user-targeting" i18n="@@common.check.the.docs">Check the docs</a>
             </ng-template>
           </i>
         </div>
@@ -79,7 +102,7 @@
             <ng-template #rulesTooltip>
               <ng-container i18n="@@ff.components.details.targeting.rules-tooltip">Serve a variation to specific targets based on their attributes</ng-container>
               <br>
-              <a target="_blank" href="https://featbit.gitbook.io/docs/feature-flags/targeting-users-with-flags/targeting-rules#creating-targeting-rules" i18n="@@common.check.the.docs">Check the docs</a>
+              <a target="_blank" href="https://docs.featbit.co/feature-flags/targeting-users-with-flags/targeting-rules#creating-targeting-rules" i18n="@@common.check.the.docs">Check the docs</a>
             </ng-template>
           </i>
           <i nz-icon (click)="onAddRule()" nzType="icons:icon-add-outline"></i>
@@ -122,10 +145,10 @@
   *ngIf="!isLoading"
   [visible]="reviewModalVisible"
   [refName]="featureFlag.name"
+  [(kind)]="reviewModalKind"
   [previous]="originalData"
   [current]="currentData"
   [refType]="refType"
-  [refs]="{targetingUsers: this.allTargetingUsers, segments: segmentIdRefs }"
   (onSave)="onSave($event)"
   (onCancel)="onCloseReviewModal()"
 >
@@ -133,3 +156,5 @@
 
 <app-expt-rules-drawer [visible]="exptRulesVisible" (close)="onSetExptRulesClosed($event)"
   [featureFlag]="featureFlag"></app-expt-rules-drawer>
+
+<pending-changes-drawer [visible]="pendingChangesDrawerVisible" [pendingChangesList]="pendingChangesList" (onItemRemoved)="onPendingChangesRemoved($event)" (close)="onPendingChangesDrawerClosed()"></pending-changes-drawer>

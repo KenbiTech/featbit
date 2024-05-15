@@ -1,3 +1,5 @@
+import { UserOriginEnum } from "@features/safe/workspaces/types/profiles";
+
 export interface IResponse {
   success: boolean,
   errors: string[],
@@ -11,6 +13,7 @@ export interface IRuleIdDispatchKey {
 
 export interface IUserType {
   id: string;
+  envId?: string;
   name: string;
   keyId: string;
   customizedProperties?: [{name: string, value: string}];
@@ -40,16 +43,70 @@ export interface IUserPropertyPresetValue {
   description: string;
 }
 
-export interface IAuthProps {
+export interface IProfile {
   id: string;
   email: string;
   name: string;
+  workspaceId: string;
+  origin: UserOriginEnum;
+}
+
+export interface IOidc {
+  clientId: string,
+  clientSecret: string,
+  tokenEndpoint: string,
+  clientAuthenticationMethod: string,
+  authorizationEndpoint: string,
+  scope: string,
+  userEmailClaim: string,
+}
+
+export interface ISso {
+  oidc: IOidc
+}
+
+export interface IWorkspace {
+  id: string,
+  name: string,
+  key: string,
+  license?: string,
+  sso?: ISso
 }
 
 export interface IOrganization {
   id: string,
   initialized: boolean,
-  name: string
+  name: string,
+}
+
+export enum LicenseFeatureEnum {
+  Asterisk = '*',
+  Sso = 'sso',
+  Schedule = 'schedule',
+  ChangeRequest = 'change-request',
+  MultiOrg = 'multi-organization',
+  GlobalUser = 'global-user'
+}
+
+export interface ILicense {
+  plan: string,
+  sub: string,
+  wsId: string,
+  iat: number,
+  exp: number,
+  issuer: string,
+  features: LicenseFeatureEnum[]
+}
+
+export class License {
+  data: ILicense;
+  constructor(private licenseStr: string) {
+    this.data = licenseStr ? JSON.parse(atob(licenseStr.split('.')[1])): null;
+  }
+
+  isGranted(feature: LicenseFeatureEnum): boolean {
+    return this.data?.features?.includes(feature) || this.data?.features?.includes(LicenseFeatureEnum.Asterisk);
+  }
 }
 
 export interface IOnboarding {
@@ -66,7 +123,7 @@ export interface IProjectEnv {
   envId: string,
   envKey: string,
   envName: string,
-  envSecret: string
+  envSecrets: ISecret[]
 }
 
 export interface IProject {
@@ -108,4 +165,15 @@ export interface EnvironmentSetting {
 
 export const EnvironmentSettingTypes = {
   SyncUrls: 'sync-urls',
+}
+
+export enum OAuthProviderEnum {
+  Google = 'Google',
+  GitHub = 'GitHub'
+}
+
+export interface OAuthProvider {
+  name: string;
+  authorizeUrl: string;
+  icon: string;
 }

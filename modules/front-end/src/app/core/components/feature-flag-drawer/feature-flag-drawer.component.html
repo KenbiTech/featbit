@@ -19,21 +19,21 @@
               formControlName="name"
               placeholder="A human-friendly name for your feature flag"
               i18n-placeholder="@@common.feature-flag-name"
-              (ngModelChange)="nameChange($event)"
             />
           </nz-form-control>
         </nz-form-item>
         <nz-form-item>
           <nz-form-label
             nzRequired
-            i18n-nzTooltipTitle="@@common.key-description"
-            nzTooltipTitle="Use key (case-sensitive) in your code to get the feature flag variation">
+            i18n-nzTooltipTitle="@@ff.key-creation-description"
+            nzTooltipTitle="Use key (case-sensitive) in your code to get the feature flag variation. Keys must only contain letters, numbers, ., _ or -.">
             Key
           </nz-form-label>
           <nz-form-control nzHasFeedback i18n-nzValidatingTip="@@common.validating" nzValidatingTip="Validating..." [nzErrorTip]="keyErrorTpl">
             <input nz-input formControlName="key" i18n-placeholder="@@common.key-generated-from-name" placeholder="Key can be auto-generated from name" />
             <ng-template #keyErrorTpl let-control>
               <ng-container *ngIf="control.hasError('required')" i18n="@@common.key-cannot-be-empty">Key cannot be empty</ng-container>
+              <ng-container *ngIf="control.hasError('pattern')" i18n="@@common.key-format-error">Only allow letters, numbers, '.', '_' or '-'</ng-container>
               <ng-container *ngIf="control.hasError('duplicated')" i18n="@@common.key-has-been-used">This key has been used</ng-container>
               <ng-container *ngIf="control.hasError('unknown')" i18n="@@common.key-validation-failed">Key validation failed</ng-container>
             </ng-template>
@@ -60,9 +60,10 @@
           </nz-tag>
         </div>
         <nz-select
+          class="nz-select-40"
           #tags
           i18n-nzPlaceHolder="@@common.add-tags"
-          nzPlaceHolder="Add Tags"
+          nzPlaceHolder="Add tags"
           nzShowSearch
           [(ngModel)]="selectedTag"
           (nzOnSearch)="onSearchTag($event)"
@@ -92,10 +93,9 @@
                        i18n="@@common.variation-type">Variation type</nz-form-label>
         <nz-form-control>
           <nz-select
-            class="variation-type-selector"
+            class="nz-select-40"
             i18n-nzPlaceHolder="@@common.variation-type"
             nzPlaceHolder="Variation type"
-            (ngModelChange)="setVariations($event)"
             formControlName="variationType">
             <nz-option  nzValue="boolean" nzLabel="boolean"></nz-option>
             <nz-option  nzValue="string" nzLabel="string"></nz-option>
@@ -149,7 +149,7 @@
       </ng-template>
     </nz-divider>
 
-    <form nz-form [formGroup]="defaultRuleForm" nzLayout="horizontal" class="form">
+    <form nz-form [formGroup]="defaultRuleForm" nzLayout="horizontal" class="form on-off-form">
       <nz-form-item>
         <nz-form-label i18n="@@common.on-off-status">ON/OFF Status</nz-form-label>
         <nz-form-control>
@@ -160,7 +160,7 @@
         <nz-form-label nzRequired i18n="@@common.serve-if-on">If the flag is ON, serve</nz-form-label>&nbsp;&nbsp;
         <nz-form-control>
           <nz-select
-            class="default-rule-selector"
+            class="nz-select-40"
             i18n-nzPlaceHolder="@@common.select-variation"
             nzPlaceHolder="Select variation"
             formControlName="enabledVariationId">
@@ -170,11 +170,11 @@
           </nz-select>
         </nz-form-control>
       </nz-form-item>
-      <nz-form-item>
+      <nz-form-item class="on-off">
         <nz-form-label nzRequired i18n="@@common.serve-if-off">If the flag is OFF, serve</nz-form-label>
         <nz-form-control>
           <nz-select
-            class="default-rule-selector"
+            class="nz-select-40"
             i18n-nzPlaceHolder="@@common.select-variation"
             nzPlaceHolder="Select variation"
             formControlName="disabledVariationId">

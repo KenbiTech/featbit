@@ -1,6 +1,5 @@
 using Confluent.Kafka;
 using Domain.Messages;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -13,29 +12,14 @@ public partial class KafkaMessageConsumer : BackgroundService
     private readonly IEnumerable<IMessageConsumer> _messageHandlers;
 
     public KafkaMessageConsumer(
-        IConfiguration configuration,
+        ConsumerConfig config,
         ILogger<KafkaMessageConsumer> logger,
         IEnumerable<IMessageConsumer> messageHandlers)
     {
         _logger = logger;
         _messageHandlers = messageHandlers;
 
-        ConsumerConfig config = new()
-        {
-            GroupId = "evaluation-server",
-            BootstrapServers = configuration["Kafka:BootstrapServers"],
-
-            // read messages from start if no commit exists
-            AutoOffsetReset = AutoOffsetReset.Earliest,
-
-            // at least once delivery semantics
-            // https://docs.confluent.io/kafka-clients/dotnet/current/overview.html#store-offsets
-            EnableAutoCommit = true,
-            AutoCommitIntervalMs = 5000,
-            // disable auto-store of offsets
-            EnableAutoOffsetStore = false
-        };
-
+        config.GroupId = $"evaluation-server-{Guid.NewGuid()}";
         _consumer = new ConsumerBuilder<Null, string>(config).Build();
     }
 

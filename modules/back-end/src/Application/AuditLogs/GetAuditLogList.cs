@@ -1,4 +1,6 @@
 using Application.Bases.Models;
+using Domain.AuditLogs;
+using Domain.SemanticPatch;
 
 namespace Application.AuditLogs;
 
@@ -36,6 +38,13 @@ public class GetAuditLogListHandler : IRequestHandler<GetAuditLogList, PagedResu
         var users = await _userService.GetListAsync(logVms.Items.Select(x => x.CreatorId));
         foreach (var item in logVms.Items)
         {
+            item.Instructions = item.RefType switch
+            {
+                AuditLogRefTypes.FeatureFlag => FlagComparer.Compare(item.DataChange),
+                AuditLogRefTypes.Segment => SegmentComparer.Compare(item.DataChange),
+                _ => Array.Empty<Instruction>()
+            };
+
             var user = users.FirstOrDefault(x => x.Id == item.CreatorId);
             if (user != null)
             {
@@ -44,13 +53,17 @@ public class GetAuditLogListHandler : IRequestHandler<GetAuditLogList, PagedResu
                 continue;
             }
 
-            // An audit log may also be created by an access token
-            var accessToken = await _accessTokenService.GetAsync(item.CreatorId);
+            // An operation can also be made by an access token through our Open Api, see "OpenApiHandler"
+            var accessToken = await _accessTokenService.FindOneAsync(x => x.Id == item.CreatorId);
             if (accessToken != null)
             {
                 item.CreatorName = accessToken.Name;
                 item.CreatorEmail = "Access token";
+                continue;
             }
+
+            // Otherwise this audit log is created by system user
+            item.CreatorEmail = "System";
         }
 
         return logVms;

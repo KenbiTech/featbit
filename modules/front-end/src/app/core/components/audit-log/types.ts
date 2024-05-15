@@ -1,9 +1,14 @@
+import { IInstruction } from "@core/components/change-list/instructions/types";
+
 export enum AuditLogOpEnum {
   Create = 'Create',
   Update = 'Update',
   Archive = 'Archive',
   Restore = 'Restore',
-  Remove = 'Remove'
+  Remove = 'Remove',
+  ApplyFlagChangeRequest = 'ApplyFlagChangeRequest',
+  ApplyFlagSchedule = 'ApplyFlagSchedule',
+
 }
 
 export enum RefTypeEnum {
@@ -22,6 +27,7 @@ export interface IAuditLog {
   createdAt: string;
   comment: string;
   dataChange: IDataChange;
+  instructions: IInstruction[];
 }
 
 export interface IDataChange {

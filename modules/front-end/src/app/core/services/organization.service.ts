@@ -18,8 +18,8 @@ export class OrganizationService {
     private projectService: ProjectService
   ) { }
 
-  async getListAsync(): Promise<IOrganization[]> {
-    return firstValueFrom(this.http.get<IOrganization[]>(this.baseUrl));
+  async getListAsync(isSsoFirstLogin: boolean = false): Promise<IOrganization[]> {
+    return firstValueFrom(this.http.get<IOrganization[]>(`${this.baseUrl}?isSsoFirstLogin=${isSsoFirstLogin}`));
   }
 
   create(params: any): Observable<any> {
@@ -41,34 +41,26 @@ export class OrganizationService {
     return this.http.post(url, payload);
   }
 
-  switchOrganization(account: IOrganization) {
-    if (!!account) {
-      localStorage.setItem(CURRENT_ORGANIZATION(), JSON.stringify(account));
-      const currentAccount = this.organizations.find(ws => ws.id == account.id);
-      currentAccount.name = account.name;
+  switchOrganization(org: IOrganization) {
+    if (!!org) {
+      localStorage.setItem(CURRENT_ORGANIZATION(), JSON.stringify(org));
+      const currentOrganization = this.organizations.find(ws => ws.id == org.id);
+      currentOrganization.name = org.name;
     } else {
       localStorage.setItem(CURRENT_ORGANIZATION(), '');
     }
 
     this.projectService.clearCurrentProjectEnv();
-    window.location.reload();
   }
 
   setOrganization(organization: IOrganization) {
     if (!!organization) {
-      const currentAccount = this.organizations.find(ws => ws.id == organization.id);
-      currentAccount.name = organization.name;
-      localStorage.setItem(CURRENT_ORGANIZATION(), JSON.stringify(currentAccount));
+      const currentOrganization = this.organizations.find(ws => ws.id == organization.id);
+      currentOrganization.name = organization.name;
+      currentOrganization.initialized = organization.initialized;
+      localStorage.setItem(CURRENT_ORGANIZATION(), JSON.stringify(currentOrganization));
     } else {
       localStorage.setItem(CURRENT_ORGANIZATION(), '');
     }
-  }
-
-  async setUserOrganizations(): Promise<IOrganization> {
-    const orgStr = localStorage.getItem(CURRENT_ORGANIZATION());
-    this.organizations = await this.getListAsync();
-    const currentOrg = !orgStr ? this.organizations[0] : this.organizations.find(ws => ws.id === JSON.parse(orgStr).id);
-    this.setOrganization(currentOrg);
-    return currentOrg;
   }
 }

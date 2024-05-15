@@ -1,9 +1,14 @@
 using Domain.AccessTokens;
+using Domain.Workspaces;
 using Domain.AuditLogs;
 using Domain.EndUsers;
 using Domain.ExperimentMetrics;
 using Domain.Experiments;
 using Domain.FeatureFlags;
+using Domain.FlagChangeRequests;
+using Domain.FlagDrafts;
+using Domain.FlagRevisions;
+using Domain.FlagSchedules;
 using Domain.Groups;
 using Domain.Members;
 using Domain.Organizations;
@@ -13,6 +18,7 @@ using Domain.RelayProxies;
 using Domain.Segments;
 using Domain.Triggers;
 using Domain.Users;
+using Domain.Webhooks;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
@@ -43,14 +49,21 @@ public class MongoDbClient
     {
         { typeof(User), "Users" },
 
+        { typeof(Workspace), "Workspaces" },
+
         { typeof(Organization), "Organizations" },
         { typeof(OrganizationUser), "OrganizationUsers" },
         { typeof(Project), "Projects" },
         { typeof(Environment), "Environments" },
         { typeof(EndUser), "EndUsers" },
+        { typeof(GlobalUser), "EndUsers" },
         { typeof(EndUserProperty), "EndUserProperties" },
         { typeof(Segment), "Segments" },
         { typeof(FeatureFlag), "FeatureFlags" },
+        { typeof(FlagRevision), "FlagRevisions" },
+        { typeof(FlagDraft), "FlagDrafts" },
+        { typeof(FlagSchedule), "FlagSchedules" },
+        { typeof(FlagChangeRequest), "FlagChangeRequests" },
         { typeof(Trigger), "Triggers" },
         { typeof(AuditLog), "AuditLogs" },
 
@@ -64,8 +77,9 @@ public class MongoDbClient
         { typeof(ExperimentMetric), "ExperimentMetrics" },
 
         { typeof(AccessToken), "AccessTokens" },
-        
         { typeof(RelayProxy), "RelayProxies" },
+        { typeof(Webhook), "Webhooks" },
+        { typeof(WebhookDelivery), "WebhookDeliveries" }
     };
 
     public IMongoCollection<TEntity> CollectionOf<TEntity>()

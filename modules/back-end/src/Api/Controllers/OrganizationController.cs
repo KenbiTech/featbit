@@ -1,4 +1,5 @@
 using Application.Organizations;
+using Domain.Workspaces;
 
 namespace Api.Controllers;
 
@@ -15,17 +16,26 @@ public class OrganizationController : ApiControllerBase
     }
 
     [HttpGet]
-    public async Task<ApiResponse<IEnumerable<OrganizationVm>>> GetListAsync()
+    public async Task<ApiResponse<IEnumerable<OrganizationVm>>> GetListAsync([FromQuery(Name = "isSsoFirstLogin")] bool isSsoFirstLogin = false)
     {
-        var request = new GetOrganizationList { UserId = CurrentUser.Id };
+        var request = new GetOrganizationList
+        {
+            UserId = CurrentUser.Id,
+            WorkspaceId = WorkspaceId,
+            IsSsoFirstLogin = isSsoFirstLogin
+        };
 
         var vms = await Mediator.Send(request);
         return Ok(vms);
     }
 
     [HttpPost]
+    [Authorize(LicenseFeatures.MultiOrg)]
     public async Task<ApiResponse<OrganizationVm>> CreateAsync(CreateOrganization request)
     {
+        request.WorkspaceId = WorkspaceId;
+        request.CurrentUserId = CurrentUser.Id;
+
         var organization = await Mediator.Send(request);
 
         return Ok(organization);
@@ -34,6 +44,7 @@ public class OrganizationController : ApiControllerBase
     [HttpPost("add-user")]
     public async Task<ApiResponse<bool>> AddMemberByEmailAsync([FromBody] AddUser request)
     {
+        request.WorkspaceId = WorkspaceId;
         request.OrganizationId = OrgId;
 
         var success = await Mediator.Send(request);
@@ -61,7 +72,7 @@ public class OrganizationController : ApiControllerBase
     }
 
     [HttpPut]
-    public async Task<ApiResponse<OrganizationVm>> UpdateAsync(UpdateOrganization request)
+    public async Task<ApiResponse<OrganizationVm>> UpdateAsync(UpdateOrganizationName request)
     {
         request.Id = OrgId;
 

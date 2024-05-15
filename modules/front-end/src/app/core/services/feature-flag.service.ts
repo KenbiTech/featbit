@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { environment } from "../../../environments/environment";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { getCurrentProjectEnv } from "@utils/project-env";
-import { Observable, of } from "rxjs";
+import { firstValueFrom, Observable, of } from "rxjs";
 import {
   ICopyToEnvResult,
   IFeatureFlagCreationPayload,
@@ -17,6 +17,7 @@ import {
 } from "@features/safe/feature-flags/types/details";
 import {IInsightsFilter, IInsights} from "@features/safe/feature-flags/details/insights/types";
 import { IVariation } from "@shared/rules";
+import { IPendingChanges } from "@core/components/pending-changes-drawer/types";
 
 @Injectable({
   providedIn: 'root'
@@ -54,6 +55,40 @@ export class FeatureFlagService {
       this.baseUrl,
       {params: new HttpParams({fromObject: queryParam})}
     );
+  }
+
+  getPendingChanges(key: string): Promise<IPendingChanges[]> {
+    return firstValueFrom(this.http.get<IPendingChanges[]>(`${this.baseUrl}/${key}/pending-changes`));
+  }
+
+  deleteSchedule(id: string): Observable<boolean> {
+    const url = `${this.baseUrl}/schedules/${id}`;
+
+    return this.http.delete<boolean>(url);
+  }
+
+  deleteChangeRequest(id: string): Observable<boolean> {
+    const url = `${this.baseUrl}/change-requests/${id}`;
+
+    return this.http.delete<boolean>(url);
+  }
+
+  declineChangeRequest(id: string): Observable<boolean> {
+    const url = `${this.baseUrl}/change-requests/${id}/decline`;
+
+    return this.http.put<boolean>(url, {});
+  }
+
+  approveChangeRequest(id: string): Observable<boolean> {
+    const url = `${this.baseUrl}/change-requests/${id}/approve`;
+
+    return this.http.put<boolean>(url, {});
+  }
+
+  applyChangeRequest(id: string): Observable<boolean> {
+    const url = `${this.baseUrl}/change-requests/${id}/apply`;
+
+    return this.http.put<boolean>(url, {});
   }
 
   updateSetting(key: string, payload: ISettingPayload): Observable<boolean> {
@@ -100,9 +135,42 @@ export class FeatureFlagService {
     return this.http.put(url, {});
   }
 
-  updateTargeting(payload: IFeatureFlagTargeting): Observable<boolean> {
-    const url = `${this.baseUrl}/${payload.key}/targeting`;
+  updateTargeting(targeting: IFeatureFlagTargeting, comment?: string): Observable<boolean> {
+    const url = `${this.baseUrl}/${targeting.key}/targeting`;
+
+    const payload = {
+      targeting,
+      comment
+    };
+
     return this.http.put<boolean>(url, payload);
+  }
+
+  createSchedule(targeting: IFeatureFlagTargeting, scheduledTime: Date, title: string, reviewers: string[], reason: string, withChangeRequest: boolean = false): Observable<boolean> {
+    const url = `${this.baseUrl}/${targeting.key}/schedules`;
+
+    const payload = {
+      targeting,
+      scheduledTime,
+      title,
+      reason,
+      reviewers,
+      withChangeRequest
+    };
+
+    return this.http.post<boolean>(url, payload);
+  }
+
+  createChangeRequest(targeting: IFeatureFlagTargeting, reviewers: string[], reason: string): Observable<boolean> {
+    const url = `${this.baseUrl}/${targeting.key}/change-requests`;
+
+    const payload = {
+      targeting,
+      reviewers,
+      reason
+    };
+
+    return this.http.post<boolean>(url, payload);
   }
 
   getAllTags(): Observable<string[]> {
