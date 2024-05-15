@@ -2,7 +2,7 @@ name: featbit
 version: "3"
 services:
   ui:
-    image: featbit/featbit-ui:latest
+    image: featbit/featbit-ui:2.4.3
     environment:
       - API_URL=https://<domain>:5001
       - DEMO_URL=https://featbit-samples.vercel.app
@@ -15,7 +15,7 @@ services:
       - featbit-network
 
   api-server:
-    image: featbit/featbit-api-server:latest
+    image: featbit/featbit-api-server:2.4.3
     environment:
       - MongoDb__ConnectionString=<connection-string>
       - MongoDb__Database=featbit
@@ -30,7 +30,7 @@ services:
       - featbit-network
 
   evaluation-server:
-    image: featbit/featbit-evaluation-server:latest
+    image: featbit/featbit-evaluation-server:2.4.3
     environment:
       - MongoDb__ConnectionString=<connection-string>
       - MongoDb__Database=featbit
@@ -43,7 +43,7 @@ services:
       - featbit-network
 
   da-server:
-    image: featbit/featbit-data-analytics-server:latest
+    image: featbit/featbit-data-analytics-server:2.4.3
     depends_on:
       - redis
     ports:
