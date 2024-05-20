@@ -1,43 +1,50 @@
 FROM python:3.9-slim-buster
-ARG KAFKA_HOSTS=kafka:9092
-ARG CLICKHOUSE_HOST=clickhouse-server
-ARG CLICKHOUSE_KAFKA_HOSTS=kafka:9092
-ARG TEST=false
-ARG SUFFIX=
-ARG CLICKHOUSE_USER=default
-ARG CLICKHOUSE_PASSWORD=
-ARG REDIS_HOST=redis
-ARG REDIS_PORT=6379
-ARG REDIS_PASSWORD=
-ARG MONGO_HOST=mongodb
-ARG MONGO_URI=mongodb://admin:password@mongodb:27017
-ARG MONGO_INITDB_DATABASE=featbit
-ARG IS_PRO=false
-ARG CHECK_DB_LIVNESS=true
-ENV KAFKA_HOSTS=${KAFKA_HOSTS} \
-    CLICKHOUSE_USER=${CLICKHOUSE_USER} \
-    CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD} \
-    CLICKHOUSE_HOST=${CLICKHOUSE_HOST} \
-    CLICKHOUSE_KAFKA_HOSTS=${CLICKHOUSE_KAFKA_HOSTS} \
-    REDIS_HOST=${REDIS_HOST} \
-    REDIS_PORT=${REDIS_PORT} \
-    REDIS_PASSWORD=${REDIS_PASSWORD} \
-    TEST=${TEST} \
-    SUFFIX=${SUFFIX} \
-    MONGO_HOST=${MONGO_HOST} \
-    MONGO_URI=${MONGO_URI} \
-    MONGO_DB=${MONGO_INITDB_DATABASE} \
-    IS_PRO=${IS_PRO} \
-    CHECK_DB_LIVNESS=${CHECK_DB_LIVNESS}
-RUN apt update &&apt install -y nginx && apt install -y supervisor && apt install -y git
+ENV TEST=false \
+    KAFKA_HOSTS=kafka:9092 \
+    KAFKA_SECURITY_PROTOCOL=PLAINTEXT \
+    KAFKA_SASL_MECHANISM=PLAIN \
+    CLICKHOUSE_USER=default \
+    CLICKHOUSE_HOST=clickhouse-server \
+    CLICKHOUSE_PORT=9000 \
+    CLICKHOUSE_HTTP_PORT=8123 \
+    CLICKHOUSE_KAFKA_HOSTS=kafka:9092 \
+    CLICKHOUSE_DATABASE=featbit \
+    CLICKHOUSE_CLUSTER=featbit_ch_cluster \
+    CLICKHOUSE_REPLICATION=true \
+    CLICKHOUSE_SECURE=false \
+    CLICKHOUSE_VERIFY=true \
+    CACHE_TYPE=RedisCache \
+    REDIS_DB=0 \
+    REDIS_SSL=false \
+    REDIS_HOST=redis \
+    REDIS_PORT=6379 \
+    MONGO_HOST=mongodb \
+    MONGO_PORT=27017 \
+    MONGO_URI=mongodb://admin:password@mongodb:27017 \
+    MONGO_DB=featbit \
+    IS_PRO=false \
+    CHECK_DB_LIVNESS=true \
+    ENABLE_OPENTELEMETRY=false \
+    OTEL_SERVICE_NAME=featbit-das \
+    OTEL_TRACES_EXPORTER=otlp \
+    OTEL_METRICS_EXPORTER=otlp \
+    OTEL_LOGS_EXPORTER=otlp \
+    OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+RUN apt update && \
+    apt install -y nginx && \ 
+    apt install -y supervisor && \ 
+    apt install -y git && \ 
+    rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /var/log/nginx && \
     touch /var/log/nginx/access.log && \
     touch /var/log/nginx/error.log
-EXPOSE 80
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY . /featbit_da
 WORKDIR /featbit_da
 RUN chmod +x start.sh docker-entrypoint.sh wait-for-it.sh
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+RUN opentelemetry-bootstrap -a install
+EXPOSE 80
 ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["/usr/bin/supervisord","-c","supervisord.conf"]

@@ -19,7 +19,7 @@ export class OrganizationDrawerComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private accountService: OrganizationService,
+    private organizationService: OrganizationService,
     private message: NzMessageService
   ) { }
 
@@ -51,7 +51,7 @@ export class OrganizationDrawerComponent implements OnInit {
 
     const { name } = this.orgForm.value;
 
-    this.accountService.create({ name })
+    this.organizationService.create({ name })
       .pipe()
       .subscribe(
         res => {
@@ -59,7 +59,8 @@ export class OrganizationDrawerComponent implements OnInit {
           this.close.emit(res);
           this.message.success($localize `:@@org.org.orgCreated:Organization successfully created!`);
         },
-        _ => {
+        err => {
+          this.message.error(err.errors[0]);
           this.isLoading = false;
         }
       );

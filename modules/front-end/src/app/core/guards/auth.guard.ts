@@ -1,14 +1,19 @@
 import { inject } from '@angular/core';
 import { ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
-import { getAuth } from '@shared/utils';
-import { CURRENT_PROJECT, LOGIN_REDIRECT_URL } from "@shared/utils/localstorage-keys";
+import { getProfile } from '@shared/utils';
+import {
+  CURRENT_ORGANIZATION,
+  IS_SSO_FIRST_LOGIN,
+  LOGIN_REDIRECT_URL
+} from "@shared/utils/localstorage-keys";
 import { PermissionsService } from "@services/permissions.service";
 import { ProjectService } from "@services/project.service";
 import { getCurrentProjectEnv } from "@utils/project-env";
-import { IEnvironment, IProject } from "@shared/types";
+import { IEnvironment, IOrganization, IProject, IProjectEnv } from "@shared/types";
 import { IdentityService } from "@services/identity.service";
 import { NzNotificationService } from "ng-zorro-antd/notification";
 import { OrganizationService } from "@services/organization.service";
+import { WorkspaceService } from "@services/workspace.service";
 
 export const authGuard = async (
   route: ActivatedRouteSnapshot,
@@ -16,24 +21,54 @@ export const authGuard = async (
   router = inject(Router),
   permissionService = inject(PermissionsService),
   projectService = inject(ProjectService),
+  workspaceService = inject(WorkspaceService),
   organizationService = inject(OrganizationService),
   identityService = inject(IdentityService),
   notification = inject(NzNotificationService)
 ) => {
-  const auth = getAuth();
+  const profile = getProfile();
   const url = state.url;
 
-  // if no auth token, redirect to login page
-  if (!auth) {
+  // if no auth token or workspaceId, redirect to login page
+  if (!profile || !profile.workspaceId) {
     localStorage.setItem(LOGIN_REDIRECT_URL, url);
     return router.parseUrl('/login');
   }
 
-  // set user organizations
-  const organization = await organizationService.setUserOrganizations();
+  // if workspaceId is invalid, logout user
+  const workspace = await workspaceService.getWorkspace();
+  if (!workspace) {
+    identityService.doLogoutUser(false);
+    return router.parseUrl('/login');
+  }
+
+  workspaceService.setWorkspace(workspace);
+  const isSsoFirstLogin = localStorage.getItem(IS_SSO_FIRST_LOGIN) === 'true';
+  const organizations = await organizationService.getListAsync(isSsoFirstLogin);
+  organizationService.organizations = organizations;
+
+  if (url.startsWith("/select-organization")) {
+    return true;
+  }
+
+  // if no available organization, redirect to select org page
+  if (organizations.length === 0) {
+    return router.parseUrl('/select-organization');
+  }
+
+  // if no current org, redirect to select org page
+  const orgStr = localStorage.getItem(CURRENT_ORGANIZATION());
+  let organization: IOrganization = orgStr ? JSON.parse(orgStr) : null;
+  if (!orgStr) {
+    localStorage.setItem(LOGIN_REDIRECT_URL, url);
+    return router.parseUrl('/select-organization');
+  }
+
+  organization = organizations.find(org => org.id === organization.id) || organizations[0];
+  organizationService.setOrganization(organization);
 
   // init user permission
-  await permissionService.initUserPolicies(auth.id);
+  await permissionService.initUserPolicies(profile.id);
 
   // if we're going to onboarding page
   if (url.startsWith("/onboarding")) {
@@ -50,7 +85,7 @@ export const authGuard = async (
     return router.parseUrl('/onboarding');
   }
 
-  // try to set user accessible project and env
+  // try to set the user-accessible project and env
   const success = await trySetAccessibleProjectEnv(projectService);
   if (!success) {
     showDenyMessage(notification);
@@ -61,17 +96,18 @@ export const authGuard = async (
   return true;
 }
 
-const setProjectEnv = (project: IProject, env: IEnvironment) => {
-  const projectEnv = {
+const setProjectEnv = (projectService: ProjectService, project: IProject, env: IEnvironment) => {
+  const projectEnv: IProjectEnv = {
     projectId: project.id,
+    projectKey: project.key,
     projectName: project.name,
     envId: env.id,
     envKey: env.key,
     envName: env.name,
-    envSecret: env.secrets[0].value
+    envSecrets: env.secrets
   };
 
-  localStorage.setItem(CURRENT_PROJECT(), JSON.stringify(projectEnv));
+  projectService.upsertCurrentProjectEnvLocally(projectEnv);
 }
 
 const showDenyMessage = (notification: NzNotificationService) => {
@@ -104,7 +140,7 @@ const trySetAccessibleProjectEnv = async (projectService: ProjectService): Promi
 
   // set project env if it's accessible
   if (canAccessEnv) {
-    setProjectEnv(project, env);
+    setProjectEnv(projectService, project, env);
   }
 
   return canAccessEnv;

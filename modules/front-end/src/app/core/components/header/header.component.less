@@ -57,6 +57,9 @@ i:hover {
   color: @green70-color;
 }
 
+.bash-board-link {
+  padding-left: 5px;
+}
 
 .org-proj-env {
   display: flex;
@@ -172,6 +175,28 @@ i:hover {
 .header-btns {
   display: flex;
   align-items: center;
+
+  .license-plan-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    border: 2px solid @yellow55-color;
+    border-radius: 8px;
+    padding: 4px 10px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-right: 8px;
+
+    .plan-name {
+      text-transform: capitalize;
+    }
+
+    i {
+      color: @yellow55-color;
+    }
+  }
+
 
   .header-btn {
     font-size: 18px;

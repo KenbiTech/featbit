@@ -1,21 +1,20 @@
 import { USER_PROFILE } from "./localstorage-keys";
-import { IAuthProps } from "../types";
+import { IProfile } from "../types";
 import { USER_IS_IN_SEGMENT, USER_IS_NOT_IN_SEGMENT } from "@shared/constants";
-import { ICondition } from "@shared/rules";
+import { UserOriginEnum } from "@features/safe/workspaces/types/profiles";
 
 export function getPathPrefix() {
   return location.pathname.match(/^(?<locale>\/en\/|\/zh\/)/i)?.groups['locale'] || '/';
 }
 
-export function getAuth() : IAuthProps | null {
-  const auth = localStorage.getItem(USER_PROFILE);
-  if (!auth) return null;
-  return JSON.parse(auth);
+export function getProfile(): IProfile | null {
+  const profile = localStorage.getItem(USER_PROFILE);
+  return !profile ? null : Object.assign({ origin: UserOriginEnum.Local }, JSON.parse(profile));
 }
 
 export function getLocalStorageKey(key: string, isUserIndependant: boolean): string {
-  const auth = getAuth();
-  return !isUserIndependant && auth ? `${key}_${auth.id}` : key;
+  const profile = getProfile();
+  return !isUserIndependant && profile ? `${key}_${profile.id}` : key;
 }
 
 export function uuidv4() {
@@ -80,10 +79,10 @@ export function encodeURIComponentFfc(url: string): string {
   return encodeURIComponent(url).replace(/\(/g, "%28").replace(/\)/g, '%29');
 }
 
-export function isSegmentCondition(condition: ICondition): boolean {
+export function isSegmentCondition(conditionProperty: string): boolean {
   const segmentRuleProperties = [USER_IS_IN_SEGMENT, USER_IS_NOT_IN_SEGMENT];
 
-  return segmentRuleProperties.includes(condition.property);
+  return segmentRuleProperties.includes(conditionProperty);
 }
 
 // determine if a rule operation is single operater
@@ -149,4 +148,8 @@ export const getTimezoneString = () => {
   const offset = - new Date().getTimezoneOffset() / 60;
 
   return encodeURIComponent(`Etc/GMT${offset >= 0 ? '-': '+'}${Math.abs(offset)}`);
+}
+
+export const trimJsonString = (json: string) => {
+  return JSON.stringify(JSON.parse(json));
 }

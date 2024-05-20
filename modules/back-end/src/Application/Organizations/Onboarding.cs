@@ -1,4 +1,5 @@
 using Application.Bases;
+using Application.Projects;
 using Domain.Projects;
 
 namespace Application.Organizations;
@@ -38,21 +39,29 @@ public class OnboardingHandler : IRequestHandler<Onboarding, bool>
 {
     private readonly IOrganizationService _organizationService;
     private readonly IProjectService _projectService;
+    private readonly IPublisher _publisher;
 
-    public OnboardingHandler(IOrganizationService organizationService, IProjectService projectService)
+    public OnboardingHandler(
+        IOrganizationService organizationService,
+        IProjectService projectService,
+        IPublisher publisher)
     {
         _organizationService = organizationService;
         _projectService = projectService;
+        _publisher = publisher;
     }
 
     public async Task<bool> Handle(Onboarding request, CancellationToken cancellationToken)
     {
         var organization = await _organizationService.GetAsync(request.OrganizationId);
-        organization.Update(request.OrganizationName, true);
+        organization.Initialize(request.OrganizationName);
         await _organizationService.UpdateAsync(organization);
 
         var project = new Project(organization.Id, request.ProjectName, request.ProjectKey);
-        await _projectService.AddWithEnvsAsync(project, request.Environments);
+        var projectWithEnvs = await _projectService.AddWithEnvsAsync(project, request.Environments);
+
+        // publish on project added notification
+        await _publisher.Publish(new OnProjectAdded(projectWithEnvs), cancellationToken);
 
         return true;
     }

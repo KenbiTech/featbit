@@ -1,5 +1,6 @@
 using Application.Bases;
 using Application.Users;
+using Domain.Users;
 
 namespace Application.Identity;
 
@@ -35,9 +36,15 @@ public class ResetPasswordHandler : IRequestHandler<ResetPassword, ResetPassword
     public async Task<ResetPasswordResult> Handle(ResetPassword request, CancellationToken cancellationToken)
     {
         var user = await _userService.GetAsync(_currentUser.Id);
+
+        if (user.Origin != UserOrigin.Local)
+        {
+            return ResetPasswordResult.Failed(ErrorCodes.ExternalUserCannotChangePassword);
+        }
+
         if (!await _identityService.CheckPasswordAsync(user, request.CurrentPassword))
         {
-            return ResetPasswordResult.Failed(ErrorCodes.PasswordMismatch);
+            return ResetPasswordResult.Failed(ErrorCodes.EmailPasswordMismatch);
         }
 
         await _identityService.ResetPasswordAsync(user, request.NewPassword);

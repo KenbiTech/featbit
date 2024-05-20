@@ -1,11 +1,16 @@
 using Domain.AuditLogs;
+using Domain.FlagDrafts;
 using Domain.Targeting;
 
 namespace Domain.FeatureFlags;
 
 public class FeatureFlag : FullAuditedEntity
 {
+    public const string KeyPattern = "^[a-zA-Z0-9._-]+$";
+
     public Guid EnvId { get; set; }
+
+    public Guid Revision { get; set; }
 
     public string Name { get; set; }
 
@@ -33,6 +38,10 @@ public class FeatureFlag : FullAuditedEntity
 
     public bool IsArchived { get; set; }
 
+    public FeatureFlag()
+    {
+    }
+
     public FeatureFlag(
         Guid envId,
         string name,
@@ -46,6 +55,8 @@ public class FeatureFlag : FullAuditedEntity
         ICollection<string> tags,
         Guid currentUserId) : base(currentUserId)
     {
+        Revision = Guid.NewGuid();
+
         EnvId = envId;
 
         Name = name;
@@ -116,9 +127,7 @@ public class FeatureFlag : FullAuditedEntity
         var dataChange = new DataChange(this);
 
         IsArchived = true;
-
-        UpdatedAt = DateTime.UtcNow;
-        UpdatorId = currentUserId;
+        MarkAsUpdated(currentUserId);
 
         return dataChange.To(this);
     }
@@ -128,9 +137,7 @@ public class FeatureFlag : FullAuditedEntity
         var dataChange = new DataChange(this);
 
         IsArchived = false;
-
-        UpdatedAt = DateTime.UtcNow;
-        UpdatorId = currentUserId;
+        MarkAsUpdated(currentUserId);
 
         return dataChange.To(this);
     }
@@ -143,9 +150,7 @@ public class FeatureFlag : FullAuditedEntity
         Description = description;
         IsEnabled = isEnabled;
         DisabledVariationId = disabledVariationId;
-
-        UpdatedAt = DateTime.UtcNow;
-        UpdatorId = currentUserId;
+        MarkAsUpdated(currentUserId);
 
         return dataChange.To(this);
     }
@@ -155,29 +160,20 @@ public class FeatureFlag : FullAuditedEntity
         var dataChange = new DataChange(this);
 
         Variations = variations;
-
-        UpdatedAt = DateTime.UtcNow;
-        UpdatorId = currentUserId;
+        MarkAsUpdated(currentUserId);
 
         return dataChange.To(this);
     }
 
-    public DataChange UpdateTargeting(
-        ICollection<TargetUser> targetUsers,
-        ICollection<TargetRule> rules,
-        Fallthrough fallthrough,
-        bool exptIncludeAllTargets,
-        Guid currentUserId)
+    public DataChange UpdateTargeting(FlagTargeting targeting, Guid currentUserId)
     {
         var dataChange = new DataChange(this);
 
-        TargetUsers = targetUsers;
-        Rules = rules;
-        Fallthrough = fallthrough;
-        ExptIncludeAllTargets = exptIncludeAllTargets;
-
-        UpdatedAt = DateTime.UtcNow;
-        UpdatorId = currentUserId;
+        TargetUsers = targeting.TargetUsers;
+        Rules = targeting.Rules;
+        Fallthrough = targeting.Fallthrough;
+        ExptIncludeAllTargets = targeting.ExptIncludeAllTargets;
+        MarkAsUpdated(currentUserId);
 
         return dataChange.To(this);
     }
@@ -197,8 +193,7 @@ public class FeatureFlag : FullAuditedEntity
         // change audited properties
         CreatedAt = DateTime.UtcNow;
         CreatorId = currentUserId;
-        UpdatedAt = CreatedAt;
-        UpdatorId = currentUserId;
+        MarkAsUpdated(currentUserId);
     }
 
     public DataChange Toggle(Guid currentUserId)
@@ -206,9 +201,7 @@ public class FeatureFlag : FullAuditedEntity
         var dataChange = new DataChange(this);
 
         IsEnabled = !IsEnabled;
-
-        UpdatedAt = DateTime.UtcNow;
-        UpdatorId = currentUserId;
+        MarkAsUpdated(currentUserId);
 
         return dataChange.To(this);
     }
@@ -225,10 +218,29 @@ public class FeatureFlag : FullAuditedEntity
         var dataChange = new DataChange(this);
 
         Tags = tags ?? Array.Empty<string>();
-
-        UpdatedAt = DateTime.UtcNow;
-        UpdatorId = currentUserId;
+        MarkAsUpdated(currentUserId);
 
         return dataChange.To(this);
+    }
+
+    public DataChange ApplyDraft(FlagDraft draft)
+    {
+        var dataChange = new DataChange(this);
+
+        var instructions = draft.GetInstructions();
+        foreach (var instruction in instructions)
+        {
+            instruction.Apply(this);
+        }
+        MarkAsUpdated(draft.CreatorId);
+
+        return dataChange.To(this);
+    }
+
+    public override void MarkAsUpdated(Guid updatorId)
+    {
+        Revision = Guid.NewGuid();
+
+        base.MarkAsUpdated(updatorId);
     }
 }

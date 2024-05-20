@@ -12,7 +12,9 @@
       data: {
         email: test@email.com,
         id: Guid_1,
-        name: 
+        name: ,
+        origin: Local,
+        workspaceId: Guid_2
       },
       errors: [],
       success: true

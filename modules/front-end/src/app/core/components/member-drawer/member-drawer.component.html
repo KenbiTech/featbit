@@ -21,12 +21,12 @@
         <nz-form-label nzRequired><ng-container i18n="@@iam.team.member-drawer.permissions">Permissions</ng-container> <span style="margin-left: 4px; color: #ff4d4f" *ngIf="isPermissionInvalid" i18n="@@iam.team.member-drawer.policy-group-set-at-least-one">(Policy and group cannot be both empty)</span></nz-form-label>
         <nz-form-control>
             <nz-select
+              class="nz-select-40"
               nzShowSearch
               nzServerSearch
-              i18n-placeholder="@@iam.team.member-drawer.policy-placeholder"
+              i18n-nzPlaceholder="@@iam.team.member-drawer.policy-placeholder"
               nzPlaceHolder="Policy"
               (nzOnSearch)="getPolicies($event)"
-              (ngModelChange)="validatePermissions()"
               formControlName="policyId">
               <ng-container *ngFor="let policy of policies.items">
                 <nz-option nzCustomContent *ngIf="!isPoliciesLoading" [nzLabel]="policy.name" [nzValue]="policy.id">
@@ -41,12 +41,12 @@
           </nz-form-control>
         <nz-form-control style="margin-top: 10px;">
             <nz-select
+              class="nz-select-40"
               nzShowSearch
               nzServerSearch
-              i18n-placeholder="@@iam.team.member-drawer.group-placeholder"
+              i18n-nzPlaceholder="@@iam.team.member-drawer.group-placeholder"
               nzPlaceHolder="Group"
               (nzOnSearch)="getGroups($event)"
-              (ngModelChange)="validatePermissions()"
               formControlName="groupId">
               <ng-container *ngFor="let group of groups.items">
                 <nz-option *ngIf="!isGroupsLoading" [nzLabel]="group.name" [nzValue]="group.id"></nz-option>

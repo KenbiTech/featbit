@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { ExperimentService } from '@services/experiment.service';
-import * as moment from 'moment';
+import { format } from 'date-fns';
 import {FeatureFlagService} from "@services/feature-flag.service";
 import {FeatureFlag, IFeatureFlag} from "@features/safe/feature-flags/types/details";
 import {IVariation} from "@shared/rules";
@@ -90,7 +90,6 @@ export class ExperimentationComponent implements OnInit, OnDestroy {
     this.refreshIntervalId = setInterval(() => {
       const activeExperimentIteration = this.onGoingExperiments.flatMap(expt => {
         expt.isLoading = true;
-
         return expt.iterations.filter(it => it.endTime === null || !it.isFinish).map( i =>
           ({
             exptId: expt.id,
@@ -119,17 +118,7 @@ export class ExperimentationComponent implements OnInit, OnDestroy {
                 expt.selectedIteration = this.processIteration({ ...expt.selectedIteration }, expt.baselineVariation.id);
                 if (iteration.updatedAt) {
                   expt.selectedIteration.updatedAt = iteration.updatedAt;
-                  expt.selectedIteration.updatedAtStr = moment(iteration.updatedAt).format('YYYY-MM-DD HH:mm');
-                }
-
-                if (expt.metricCustomEventTrackOption === this.customEventTrackNumeric) {
-                  // [min, max, max - min]
-                  expt.selectedIteration.numericConfidenceIntervalBoundary = [
-                    Math.min(...expt.selectedIteration.results.map(r => r.confidenceInterval[0])),
-                    Math.max(...expt.selectedIteration.results.map(r => r.confidenceInterval[1])),
-                  ];
-
-                  expt.selectedIteration.numericConfidenceIntervalBoundary.push(expt.selectedIteration.numericConfidenceIntervalBoundary[1] - expt.selectedIteration.numericConfidenceIntervalBoundary[0]);
+                  expt.selectedIteration.updatedAtStr = format(iteration.updatedAt, 'yyyy-MM-dd HH:mm');
                 }
 
                 // update experiment original iterations
@@ -163,16 +152,6 @@ export class ExperimentationComponent implements OnInit, OnDestroy {
           if (expt.iterations.length > 0) {
             expt.iterations = expt.iterations.map(iteration => this.processIteration(iteration, expt.baselineVariation.id)).reverse();
             expt.selectedIteration = expt.iterations[0];
-
-            if (expt.metricCustomEventTrackOption === this.customEventTrackNumeric) {
-              // [min, max, max - min]
-              expt.selectedIteration.numericConfidenceIntervalBoundary = [
-                Math.min(...expt.selectedIteration.results.map(r => r.confidenceInterval[0])),
-                Math.max(...expt.selectedIteration.results.map(r => r.confidenceInterval[1])),
-              ];
-
-              expt.selectedIteration.numericConfidenceIntervalBoundary.push(expt.selectedIteration.numericConfidenceIntervalBoundary[1] - expt.selectedIteration.numericConfidenceIntervalBoundary[0]);
-            }
 
             this.loadIterationResults(expt);
           } else {
@@ -225,7 +204,7 @@ export class ExperimentationComponent implements OnInit, OnDestroy {
     this.experimentService.stopIteration(expt.id, expt.selectedIteration.id).subscribe(res => {
       if (res) {
         expt.selectedIteration.endTime = res.endTime;
-        expt.selectedIteration.dateTimeInterval = `${moment(expt.selectedIteration.startTime).format('YYYY-MM-DD HH:mm')} - ${moment(expt.selectedIteration.endTime).format('YYYY-MM-DD HH:mm')}`
+        expt.selectedIteration.dateTimeInterval = `${format(expt.selectedIteration.startTime, 'yyyy-MM-dd HH:mm')} - ${format(expt.selectedIteration.endTime, 'yyyy-MM-dd HH:mm')}`
         expt.status = ExperimentStatus.Paused;
       }
 
@@ -265,17 +244,7 @@ export class ExperimentationComponent implements OnInit, OnDestroy {
         expt.selectedIteration = this.processIteration({...expt.selectedIteration , ...res[0]}, expt.baselineVariation.id);
         if (res[0].updatedAt) {
           expt.selectedIteration.updatedAt = res[0].updatedAt;
-          expt.selectedIteration.updatedAtStr = moment(res[0].updatedAt).format('YYYY-MM-DD HH:mm');
-        }
-
-        if (expt.metricCustomEventTrackOption === this.customEventTrackNumeric) {
-          // [min, max, max - min]
-          expt.selectedIteration.numericConfidenceIntervalBoundary = [
-            Math.min(...expt.selectedIteration.results.map(r => r.confidenceInterval[0])),
-            Math.max(...expt.selectedIteration.results.map(r => r.confidenceInterval[1])),
-          ];
-
-          expt.selectedIteration.numericConfidenceIntervalBoundary.push(expt.selectedIteration.numericConfidenceIntervalBoundary[1] - expt.selectedIteration.numericConfidenceIntervalBoundary[0]);
+          expt.selectedIteration.updatedAtStr = format(res[0].updatedAt, 'yyyy-MM-dd HH:mm');
         }
 
         this.setExptStatus(expt, res[0]);
@@ -321,23 +290,19 @@ export class ExperimentationComponent implements OnInit, OnDestroy {
         const found = iteration.results?.find(r => r.variationId === option.id);
         return !found ? this.createEmptyIterationResult(option, baselineVariationId) : { ...found,
           variationValue: option.value,
-          confidenceInterval: !found.confidenceInterval ? [-1, -1] : found.confidenceInterval.map(x => Math.max(0, x)),
+          confidenceInterval: !found.confidenceInterval ? [-1, -1] : found.confidenceInterval,
           isEmpty: false,
         }
       });
 
-    if (iterationResults.length === 0) {
-      console.log('------------- Hello, Did you find what you want?--------------------')
-    }
-
     const invalidVariation = !!iterationResults.find(e => e.isInvalid && !e.isBaseline);
     const winnerVariation = !!iterationResults.find(e => e.isWinner);
 
-    const nowStr = $localize `:@@common.now:Now`;
-    const startStr = `${moment(iteration.startTime).format('YYYY-MM-DD HH:mm')}`;
+    const nowStr = (iteration.isFinish === true) ? "" : "(" + ($localize `:@@common.now:Now`) + ")";
+    const startStr = `${format(iteration.startTime, 'yyyy-MM-dd HH:mm')}`;
     const endStr = `${iteration.endTime ?
-      moment(iteration.endTime).format('YYYY-MM-DD HH:mm') :
-      moment(new Date()).format('YYYY-MM-DD HH:mm')}  (${nowStr})`
+      format(iteration.endTime, 'yyyy-MM-dd HH:mm') :
+      format(new Date(), 'yyyy-MM-dd HH:mm')}  ${nowStr}`
 
     return {
       ...iteration,
@@ -403,7 +368,7 @@ export class ExperimentationComponent implements OnInit, OnDestroy {
         name: xAxisName,
         position: 'end',
         field: 'time',
-        scale: {type: "timeCat", nice: true, range: [0.05, 0.95], mask: 'YYYY-MM-DD HH:mm'}
+        scale: {type: "timeCat", nice: true, range: [0.05, 0.95], mask: 'yyyy-mm-dd HH:mm'}
       },
       yAxis: {
         name: yAxisName,

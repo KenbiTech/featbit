@@ -8,6 +8,14 @@
 // Override less variables to here
 // View all variables: https://github.com/NG-ZORRO/ng-zorro-antd/blob/master/components/style/themes/default.less
 
+@import "styles/nz-select.less";
+@import "styles/nz-input.less";
+@import "styles/nz-tabset.less";
+@import "styles/icon.less";
+@import "styles/nz-segmented.less";
+@import "styles/standards.less";
+@import "styles/nz-drawer.less";
+@import "styles/nz-modal.less";
 @import "variables";
 
 html,
@@ -101,27 +109,15 @@ app-root {
   border-radius: 8px;
   padding-left: 8px;
   padding-right: 8px;
+
+  ul {
+    margin: 4px;
+    padding-inline-start: 16px;
+  }
 }
 
 .ant-input-prefix {
   padding: 0 5px;
-}
-
-// standard button
-.standard-btn {
-  width: 148px;
-  height: 40px;
-  border-radius: 32px;
-  font-weight: 500;
-  font-size: 14px;
-
-  text-shadow: none;
-  box-shadow: none;
-  border: none;
-
-  i {
-    font-size: 16px;
-  }
 }
 
 // no-bottom-line ant-tabs
@@ -136,41 +132,6 @@ app-root {
   border: none;
 }
 
-// bordered input
-.standard-bordered-input {
-  border: 1px solid @grey20-color;
-  box-sizing: border-box;
-  border-radius: 8px;
-
-  i {
-    font-size: 20px;
-    color: @grey40-color;
-  }
-}
-
-.target-users,
-.flag-container {
-  .status-switcher .ant-select .ant-select-selector .ant-select-selection-item {
-    margin-top: 1px !important;
-  }
-
-  .ant-select .ant-select-selector {
-    height: 36px !important;
-
-    &::after {
-      line-height: 31px !important;
-    }
-
-    .ant-select-selection-search-input,
-    .ant-select-selection-placeholder {
-      margin-top: 2px !important;
-      line-height: 31px !important;
-      font-size: 13px;
-      height: 31px !important;
-    }
-  }
-}
-
 .ant-picker-range {
   height: 40px;
   border-radius: 20px;
@@ -178,7 +139,7 @@ app-root {
 
 .find-rule {
   .ant-card {
-    min-width: 910px;
+    width: 100%;
   }
 
   .ant-card-head {
@@ -188,114 +149,11 @@ app-root {
   .ant-card-body {
     padding-top: 0;
   }
-
-  .rule-item {
-    .ant-select .ant-select-selector {
-      height: 36px !important;
-
-      .ant-select-selection-search-input,
-      .ant-select-selection-placeholder {
-        margin-top: 2px !important;
-      }
-    }
-
-    .multi-select {
-      .ant-select-selection-search {
-        width: 60px !important;
-      }
-
-      .ant-select-selection-item {
-        margin-top: 5px !important;
-      }
-
-      .ant-select-selection-item-content {
-        max-width: 90px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      i {
-        font-size: 10px !important;
-      }
-    }
-  }
 }
 
-// standard select
-.standard-select {
-  .standard-bordered-input;
-  height: 40px;
-
-  .ant-select-selection-search-input,
-  .ant-select-selection-placeholder,
-  .ant-select-selection-item {
-    margin: 3px;
-  }
-}
-
-.standard-form-input {
-  .standard-bordered-input;
-  height: 40px;
-}
-
-// standard div
-.standard-div {
-  border-radius: 20px;
-  padding: 24px;
-  background-color: @grey5-color;
-
-  // standard inputs
-  nz-input-group {
-    .standard-bordered-input;
-    padding: 9px;
-  }
-
-  // copy icon
-  i.copy-icon {
-    font-size: 20px;
-    color: @grey40-color;
-    cursor: pointer;
-  }
-
-  // select
-  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
-    .standard-select;
-  }
-
-  // primary button
-  .ant-btn-primary {
-    .standard-btn;
-  }
-}
-
-// form label
-.ant-form-item-label > label {
-  font-size: 14px;
-  line-height: 150%;
-  color: @grey70-color;
-}
-
-// standard form
-.standard-form {
-  nz-form-control {
-    max-width: unset;
-  }
-
-  // input
-  input {
-    .standard-form-input;
-  }
-
-  // select
-  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
-    .standard-select;
-  }
-
-  // textarea
-  textarea {
-    .standard-bordered-input;
-    height: 80px;
-  }
+// multiple select placeholder
+.ant-select-multiple .ant-select-selection-placeholder {
+  top: 40%;
 }
 
 // table style
@@ -337,76 +195,14 @@ app-root {
     .ant-btn-primary {
       .standard-btn;
     }
-
-    // select
-    .ant-select-selector {
-      border-radius: 32px;
-      width: 200px;
-      height: 40px;
-
-      .ant-select-selection-search-input,
-      .ant-select-selection-placeholder,
-      .ant-select-selection-item {
-        margin: 4px;
-      }
-    }
-
-    // middle select
-    .middle-select .ant-select-selector {
-      .ant-select-selector;
-      width: 250px;
-    }
-
-    // tag select
-    .tag-select .ant-select-selector {
-      .ant-select-selector;
-      width: 230px;
-      padding-right: 16px !important;
-
-      .ant-select-selection-item {
-        border-radius: 5px;
-        background-color: @grey10-color;
-      }
-
-      .ant-select-selection-search {
-        width: 15px !important;
-        margin: 0 !important;
-      }
-
-      .ant-select-selection-placeholder {
-        margin: 0;
-      }
-    }
-
-    // tag multiple select item
-    .ant-select-multiple .ant-select-selection-item {
-      max-width: 88px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
   }
 }
 
-// custom select arrow
-.ant-select-arrow {
-  display: none;
-}
-
-.ant-select-selector::after {
-  position: absolute;
-  right: 11px;
-  visibility: visible !important;
-  width: 20px !important;
-  height: 20px;
-  content: url("assets/icons/icon-dropdown.svg") !important;
-  align-self: center;
-}
-
+// custom pagination
 .ant-pagination-options .ant-select-selector::after {
   right: 2px;
 }
 
-// custom pagination
 .ant-pagination .ant-table-pagination {
   line-height: 16px;
 }
@@ -481,15 +277,6 @@ app-root {
   margin-left: 12px;
 }
 
-// custom tab style
-.ant-tabs-tab a,
-.ant-tabs-tab-btn {
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 150%;
-  color: @grey50-color;
-}
-
 // login tab style
 .login-wrapper {
   .ant-tabs-top>.ant-tabs-nav {
@@ -523,34 +310,6 @@ app-root {
       color: @grey50-color;
     }
   }
-}
-
-.ant-tabs-tab-active a,
-.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: @grey80-color;
-}
-
-.ant-tabs-top>.ant-tabs-nav::before {
-  bottom: 2px;
-  border-color: @divider-color;
-}
-
-.ant-tabs-ink-bar {
-  height: 2px;
-  background: transparent;
-}
-
-.ant-tabs-ink-bar::after {
-  content: " ";
-  position: absolute;
-  left: 50%;
-  right: 0;
-  bottom: 0;
-  height: 5px;
-  background: @primary-color;
-  border-radius: 5px;
-  width: 16px;
-  transform: translateX(-50%);
 }
 
 // custom card style
@@ -594,87 +353,6 @@ app-root {
   padding-top: 10px;
 }
 
-// custom modal
-.ant-modal {
-  min-width: 600px;
-  min-height: 400px;
-}
-
-.ant-modal-content,
-.ant-modal-header {
-  border-radius: 20px;
-}
-
-.ant-modal-header {
-  padding: 24px 40px 0 40px;
-  border: none;
-
-  .ant-modal-title {
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 150%;
-    color: @grey70-color;
-  }
-
-  &::after {
-    content: "";
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    margin-top: 16px;
-    border-bottom: 1px solid @divider-color;
-  }
-}
-
-.ant-modal-close-x {
-  font-size: 24px;
-  color: @grey40-color;
-  padding-top: 8px;
-  padding-right: 35px;
-  width: unset;
-
-  i,
-  .ant-modal-close-icon {
-    display: none;
-  }
-
-  &::before {
-    display: inline-block;
-    height: 24px;
-    width: 24px;
-    content: url("assets/icons/icon-close.svg");
-  }
-
-  &:hover {
-    cursor: pointer;
-    filter: brightness(0.5);
-  }
-}
-
-.ant-modal-body {
-  padding: 16px 40px;
-  .standard-form;
-}
-
-.ant-modal-footer {
-  border: none;
-  padding: 0 40px 24px 40px;
-
-  .ant-btn {
-    .standard-btn;
-
-    &:not(.ant-btn-primary) {
-      color: @grey50-color;
-      border-radius: 36px;
-      border: 1px solid @grey40-color;
-
-      &:hover {
-        background-color: @grey10-color;
-      }
-    }
-  }
-}
-
 // custom nz-list
 .ant-list-header {
   border-bottom: 1px solid @divider-color;
@@ -689,41 +367,6 @@ app-root {
 .ant-divider-vertical {
   margin: 0 24px;
   border-color: @divider-color;
-}
-
-// custom drawer
-.ant-drawer-header {
-  margin: 0 24px;
-  padding: 20px 0;
-}
-
-.ant-drawer-body {
-  .standard-form;
-  padding: 20px 24px;
-
-  .submit-btn {
-    .standard-btn;
-    float: right;
-    margin-top: 48px;
-  }
-}
-
-.ant-drawer-title {
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 150%;
-  color: @grey70-color;
-}
-
-.ant-drawer-extra {
-  i {
-    font-size: 20px;
-
-    &:hover {
-      cursor: pointer;
-      filter: brightness(0.5);
-    }
-  }
 }
 
 // assures tabs take all available height
@@ -893,23 +536,7 @@ app-root {
   gap: 16px;
 }
 
-.filters-area {
-  .ant-select .ant-select-selector {
-    border-radius: 32px !important;
-    height: 40px;
-
-    .ant-select-selection-item {
-      display: flex;
-      align-items: center;
-    }
-  }
-}
-
 // custom checkbox
-.ant-checkbox {
-  margin-right: 4px;
-}
-
 .ant-checkbox-inner {
   border: 2px solid #A8B0B9;
   background-color: white;
@@ -1006,7 +633,7 @@ app-root {
 }
 
 // env secrets popover style
-.env-secret-popover {
+.env-secret-popover, .license-data-popover {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1056,6 +683,9 @@ app-root {
   }
 }
 
+.license-data-popover {
+  max-width: 100%;
+}
 // custom nz-alert
 .ant-alert {
   padding: 24px;

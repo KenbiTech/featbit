@@ -15,6 +15,25 @@ export interface Resource {
   type: ResourceTypeEnum;
 }
 
+export interface ResourceV2 {
+  id: string;
+  name: string;
+  pathName: string;
+  rn: string;
+  type: ResourceTypeEnum;
+}
+
+export interface ResourceFilter {
+  type: ResourceTypeEnum;
+  name: string;
+}
+
+export interface ResourceFilterV2 {
+  spaceLevel: ResourceSpaceLevel;
+  types: ResourceTypeEnum[];
+  name: string;
+}
+
 export interface ValPlaceholder {
   displayName: string,
   name: string
@@ -32,7 +51,7 @@ export interface IamPolicyAction {
 
 export enum ResourceTypeEnum {
   All = '*',
-  Account = 'account',
+  organization = 'organization',
   IAM = 'iam',
   AccessToken = 'access-token',
   RelayProxy = 'relay-proxy',
@@ -40,6 +59,11 @@ export enum ResourceTypeEnum {
   Env = 'env',
   Flag = 'flag',
   Segment = 'segment'
+}
+
+export enum ResourceSpaceLevel {
+  Workspace = 'workspace',
+  Organization = 'organization'
 }
 
 export enum EffectEnum {
@@ -61,7 +85,7 @@ export interface RNViewModel {
 
 export const generalResourceRNPattern = {
   all: '*',
-  account: 'account/*',
+  organization: 'organization/*',
   iam: 'iam/*',
   accessToken: 'access-token/*',
   "access-token": 'access-token/*', // this duplicated property is necessary for resource types consisting of multiple words because of access-token-drawer.component.ts line 132
@@ -79,10 +103,10 @@ export const ResourceTypeAll: ResourceType = {
   displayName: $localize`:@@iam.rsc-type.all:All`
 };
 
-export const ResourceTypeAccount: ResourceType = {
-  type: ResourceTypeEnum.Account,
-  pattern: generalResourceRNPattern.account,
-  displayName: $localize`:@@iam.rsc-type.account:Account`
+export const ResourceTypeOrganization: ResourceType = {
+  type: ResourceTypeEnum.organization,
+  pattern: generalResourceRNPattern.organization,
+  displayName: $localize`:@@iam.rsc-type.organization:Organization`
 };
 
 export const ResourceTypeIAM: ResourceType = {
@@ -129,7 +153,7 @@ export const ResourceTypeSegment = {
 
 export const resourcesTypes: ResourceType[] = [
   ResourceTypeAll,
-  ResourceTypeAccount,
+  ResourceTypeOrganization,
   ResourceTypeIAM,
   ResourceTypeAccessToken,
   ResourceTypeRelayProxy,
@@ -149,7 +173,7 @@ export interface ResourceParamViewModel {
 
 export const rscParamsDict: { [key in ResourceTypeEnum]: ResourceParamViewModel[] } = {
   [ResourceTypeEnum.All]: [],
-  [ResourceTypeEnum.Account]: [],
+  [ResourceTypeEnum.organization]: [],
   [ResourceTypeEnum.IAM]: [],
   [ResourceTypeEnum.AccessToken]: [],
   [ResourceTypeEnum.RelayProxy]: [],
@@ -323,11 +347,11 @@ export const permissionActions: { [key: string]: IamPolicyAction } = {
     isSpecificApplicable: false
   },
 
-  // account
+  // org
   UpdateOrgName: {
     id: uuidv4(),
     name: 'UpdateOrgName',
-    resourceType: ResourceTypeEnum.Account,
+    resourceType: ResourceTypeEnum.organization,
     displayName: $localize`:@@iam.action.update-org-name:Update org name`,
     description: $localize`:@@iam.action.update-org-name:Update org name`,
     isOpenAPIApplicable: false,
@@ -399,7 +423,7 @@ export const permissionActions: { [key: string]: IamPolicyAction } = {
 // if returns false, that means the actions which cannot be applied to a specific resource should be hidden
 // ex: CreateProject should not be available for a specific project: project/abc
 export function isResourceGeneral(type: ResourceTypeEnum, rn: string): boolean {
-  const generalResourceTypes = [ResourceTypeEnum.All, ResourceTypeEnum.Account, ResourceTypeEnum.IAM, ResourceTypeEnum.AccessToken, ResourceTypeEnum.RelayProxy];
+  const generalResourceTypes = [ResourceTypeEnum.All, ResourceTypeEnum.organization, ResourceTypeEnum.IAM, ResourceTypeEnum.AccessToken, ResourceTypeEnum.RelayProxy];
   if (generalResourceTypes.includes(type)) {
     return true;
   }
